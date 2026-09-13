@@ -21,13 +21,6 @@ const relationMeta = {
   related: { forward: '関連が深い', reverse: '関連が深い', group: 'side' },
 };
 
-const groupMeta = {
-  before: { title: 'これを理解する前に', subtitle: '先に知っておくと、ここが分かりやすくなる', icon: '←' },
-  after: { title: 'ここからつながる', subtitle: 'この知識を足場に、次へ進める', icon: '→' },
-  uses: { title: '使われるところ', subtitle: '技術や身近なものの中で生きている', icon: '↗' },
-  side: { title: '横につながる知識', subtitle: '一緒に見ると理解が広がる', icon: '＋' },
-};
-
 let knowledge = { nodes: [], edges: [], featuredPaths: [] };
 let nodesById = new Map();
 
@@ -167,7 +160,7 @@ function renderOverviewMap(path, index) {
     summary.textContent = node.summary;
     const detail = document.createElement('a');
     detail.href = `#node=${encodeURIComponent(node.id)}`;
-    detail.textContent = '周辺も見る';
+    detail.textContent = 'マップで広げる';
     card.append(meta, name, summary, detail);
     flow.append(card);
 
@@ -306,93 +299,179 @@ function renderNodeGrid(kind) {
   nodes.forEach((node) => grid.append(renderNodeCard(node)));
 }
 
-function renderRelationCard(connection) {
+function buildMindMap(rootId, limit = 15) {
+  const direct = connectedEdges(rootId)
+    .map((edge) => ({ edge, connection: connectionFor(edge, rootId) }))
+    .filter((item) => item.connection.other)
+    .slice(0, 8);
+  const visibleIds = new Set([rootId, ...direct.map((item) => item.connection.other.id)]);
+  const second = [];
+
+  for (let round = 0; visibleIds.size < limit; round += 1) {
+    let added = false;
+    for (const parent of direct) {
+      const candidates = connectedEdges(parent.connection.other.id)
+        .map((edge) => ({ edge, connection: connectionFor(edge, parent.connection.other.id) }))
+        .filter((item) => item.connection.other && !visibleIds.has(item.connection.other.id));
+      const candidate = candidates[round];
+      if (!candidate) continue;
+      visibleIds.add(candidate.connection.other.id);
+      second.push({ ...candidate, parentId: parent.connection.other.id });
+      added = true;
+      if (visibleIds.size >= limit) break;
+    }
+    if (!added) break;
+  }
+
+  const positioned = [];
+  const placeRing = (items, radiusX, radiusY, level, phase = -Math.PI / 2) => {
+    items.forEach((item, index) => {
+      const angle = phase + (Math.PI * 2 * index) / Math.max(items.length, 1);
+      positioned.push({
+        ...item,
+        level,
+        x: 500 + Math.cos(angle) * radiusX,
+        y: 325 + Math.sin(angle) * radiusY,
+      });
+    });
+  };
+  placeRing(direct, 245, 185, 1);
+  const outerRadiusX = window.matchMedia('(max-width: 720px)').matches ? 365 : 410;
+  placeRing(second, outerRadiusX, 275, 2, -Math.PI / 2 + (second.length > 1 ? Math.PI / second.length : 0));
+  return positioned;
+}
+
+function makeMindMapNode(node, position, isRoot = false) {
   const button = document.createElement('button');
   button.type = 'button';
-  button.className = 'relation-card';
-  button.addEventListener('click', () => navigateToNode(connection.other.id));
-  const title = document.createElement('strong');
-  title.textContent = connection.other.name;
-  const label = document.createElement('small');
-  label.textContent = connection.label;
-  const reason = document.createElement('p');
-  reason.textContent = connection.reason;
-  button.append(title, label, reason);
+  button.className = `mindmap-node${isRoot ? ' is-root' : ''}${position?.level === 2 ? ' is-outer' : ''}`;
+  button.dataset.kind = node.kind;
+  button.style.left = `${(position?.x ?? 500) / 10}%`;
+  button.style.top = `${(position?.y ?? 325) / 6.5}%`;
+  button.style.setProperty('--delay', `${isRoot ? 0 : (position.level * 80 + position.order * 32)}ms`);
+  button.setAttribute('aria-label', isRoot ? `${node.name}（現在の中心）` : `${node.name}を中心に広げる`);
+  if (isRoot) button.disabled = true;
+  else button.addEventListener('click', () => navigateToNode(node.id));
+
+  const dot = document.createElement('i');
+  dot.setAttribute('aria-hidden', 'true');
+  const name = document.createElement('strong');
+  name.textContent = node.name;
+  button.append(dot, name);
+  if (isRoot) {
+    const count = document.createElement('small');
+    count.textContent = `${connectedEdges(node.id).length}本のつながり`;
+    button.append(count);
+  }
   return button;
 }
 
-function renderNode(id) {
+function renderMindMap(id) {
   const node = nodesById.get(id);
   if (!node) return renderNotFound();
-  document.title = `${node.name}｜どうして勉強しないといけないの？`;
+  document.title = `${node.name}の知識マップ｜どうして勉強しないといけないの？`;
   app.replaceChildren();
+
   const page = document.createElement('article');
-  page.className = 'detail-page';
-  const hero = document.createElement('header');
-  hero.className = 'detail-hero';
-  const back = makeButton('back-button', '← 知識を見渡す', () => { location.hash = ''; });
-  const layout = document.createElement('div');
-  layout.className = 'detail-layout';
-  const copy = document.createElement('div');
-  const kind = document.createElement('span');
-  kind.className = 'detail-kind';
-  kind.style.color = kindMeta[node.kind]?.color === '#2962ff' ? '#7fa5ff' : (kindMeta[node.kind]?.color || '#3bd3c6');
-  kind.textContent = kindMeta[node.kind]?.label || node.kind;
+  page.className = 'mindmap-page';
+  const toolbar = document.createElement('header');
+  toolbar.className = 'mindmap-toolbar';
+  const back = makeButton('mindmap-back', '← テーマ一覧', () => { location.hash = ''; });
+  const heading = document.createElement('div');
+  const eyebrow = document.createElement('span');
+  eyebrow.textContent = '2段先までを一望';
   const title = document.createElement('h1');
-  title.textContent = node.name;
-  const summary = document.createElement('p');
-  summary.className = 'detail-summary';
-  summary.textContent = node.summary;
-  copy.append(kind, title, summary);
-  const curriculum = document.createElement('aside');
-  curriculum.className = 'curriculum-card';
-  const levelLabel = document.createElement('span');
-  levelLabel.textContent = '学ぶ目安';
-  const level = document.createElement('strong');
-  level.textContent = node.curriculum || node.level || '学びのどこからでも';
-  const fieldLabel = document.createElement('span');
-  fieldLabel.style.marginTop = '15px';
-  fieldLabel.textContent = '分野';
-  const field = document.createElement('strong');
-  field.textContent = node.field;
-  curriculum.append(levelLabel, level, fieldLabel, field);
-  layout.append(copy, curriculum);
-  hero.append(back, layout);
+  title.textContent = `${node.name}から広がる地図`;
+  heading.append(eyebrow, title);
+  const guide = document.createElement('p');
+  guide.textContent = '気になる丸を押すと、そこを中心に地図が広がります。';
+  toolbar.append(back, heading, guide);
 
-  const content = document.createElement('div');
-  content.className = 'detail-content';
-  const context = document.createElement('div');
-  context.className = 'context-line';
-  context.append(document.createTextNode('この概念から'));
-  const count = document.createElement('span');
-  count.textContent = `${connectedEdges(id).length}個のつながり`;
-  context.append(count, document.createTextNode('をたどれます'));
-  content.append(context);
+  const layout = document.createElement('div');
+  layout.className = 'mindmap-layout';
+  const canvasWrap = document.createElement('section');
+  canvasWrap.className = 'mindmap-canvas-wrap';
+  const canvas = document.createElement('div');
+  canvas.className = 'mindmap-canvas';
+  canvas.setAttribute('aria-label', `${node.name}を中心にした知識マップ`);
 
-  const grouped = { before: [], after: [], uses: [], side: [] };
-  connectedEdges(id).map((edge) => connectionFor(edge, id)).filter((item) => item.other).forEach((item) => grouped[item.group].push(item));
-  Object.entries(groupMeta).forEach(([groupKey, meta]) => {
-    if (!grouped[groupKey].length) return;
-    const section = document.createElement('section');
-    section.className = 'relation-section';
-    const heading = document.createElement('div');
-    heading.className = 'relation-title';
-    const icon = document.createElement('i');
-    icon.textContent = meta.icon;
-    const headingCopy = document.createElement('div');
-    const h2 = document.createElement('h2');
-    h2.textContent = meta.title;
-    const subtitle = document.createElement('p');
-    subtitle.textContent = meta.subtitle;
-    headingCopy.append(h2, subtitle);
-    heading.append(icon, headingCopy);
-    const list = document.createElement('div');
-    list.className = 'relation-list';
-    grouped[groupKey].forEach((connection) => list.append(renderRelationCard(connection)));
-    section.append(heading, list);
-    content.append(section);
+  const nodeLimit = window.matchMedia('(max-width: 720px)').matches ? 11 : 15;
+  const positions = buildMindMap(id, nodeLimit).map((item, index) => ({ ...item, order: index }));
+  const positionsById = new Map(positions.map((item) => [item.connection.other.id, item]));
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('class', 'mindmap-lines');
+  svg.setAttribute('viewBox', '0 0 1000 650');
+  svg.setAttribute('preserveAspectRatio', 'none');
+  svg.setAttribute('aria-hidden', 'true');
+
+  positions.forEach((position) => {
+    const source = position.level === 1 ? { x: 500, y: 325 } : positionsById.get(position.parentId);
+    if (!source) return;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', source.x);
+    line.setAttribute('y1', source.y);
+    line.setAttribute('x2', position.x);
+    line.setAttribute('y2', position.y);
+    line.setAttribute('class', `mindmap-line level-${position.level}`);
+    line.style.setProperty('--delay', `${position.level * 70 + position.order * 28}ms`);
+    svg.append(line);
   });
-  page.append(hero, content);
+  canvas.append(svg, makeMindMapNode(node, null, true));
+
+  positions.forEach((position) => {
+    const relatedNode = position.connection.other;
+    canvas.append(makeMindMapNode(relatedNode, position));
+    if (position.level !== 1) return;
+    const label = document.createElement('span');
+    label.className = 'mindmap-edge-label';
+    label.textContent = position.connection.label;
+    label.style.left = `${(500 + (position.x - 500) * 0.56) / 10}%`;
+    label.style.top = `${(325 + (position.y - 325) * 0.56) / 6.5}%`;
+    label.style.setProperty('--delay', `${position.level * 70 + position.order * 28}ms`);
+    canvas.append(label);
+  });
+
+  const legend = document.createElement('div');
+  legend.className = 'mindmap-legend';
+  Object.entries(kindMeta).forEach(([kind, meta]) => {
+    const item = document.createElement('span');
+    item.dataset.kind = kind;
+    item.textContent = meta.label;
+    legend.append(item);
+  });
+  canvasWrap.append(canvas, legend);
+
+  const inspector = document.createElement('aside');
+  inspector.className = 'mindmap-inspector';
+  const inspectorKind = document.createElement('span');
+  inspectorKind.className = 'inspector-kind';
+  inspectorKind.dataset.kind = node.kind;
+  inspectorKind.textContent = kindMeta[node.kind]?.label || node.kind;
+  const inspectorTitle = document.createElement('h2');
+  inspectorTitle.textContent = node.name;
+  const summary = document.createElement('p');
+  summary.className = 'inspector-summary';
+  summary.textContent = node.summary;
+  const meta = document.createElement('dl');
+  meta.innerHTML = `<div><dt>学ぶ目安</dt><dd>${node.curriculum || node.level || 'どこからでも'}</dd></div><div><dt>分野</dt><dd>${node.field}</dd></div>`;
+  const relationTitle = document.createElement('h3');
+  relationTitle.textContent = '直接つながる理由';
+  const relationList = document.createElement('div');
+  relationList.className = 'inspector-relations';
+  connectedEdges(id).map((edge) => connectionFor(edge, id)).filter((item) => item.other).forEach((connection) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.addEventListener('click', () => navigateToNode(connection.other.id));
+    const relationHeading = document.createElement('span');
+    relationHeading.innerHTML = `<b>${connection.other.name}</b><small>${connection.label}</small>`;
+    const reason = document.createElement('p');
+    reason.textContent = connection.reason;
+    button.append(relationHeading, reason);
+    relationList.append(button);
+  });
+  inspector.append(inspectorKind, inspectorTitle, summary, meta, relationTitle, relationList);
+  layout.append(canvasWrap, inspector);
+  page.append(toolbar, layout);
   app.append(page);
   app.focus({ preventScroll: true });
 }
@@ -440,7 +519,7 @@ function updateSearch() {
 
 function renderRoute() {
   const id = getRoute();
-  if (id) renderNode(id);
+  if (id) renderMindMap(id);
   else renderHome();
 }
 
