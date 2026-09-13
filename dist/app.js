@@ -79,12 +79,16 @@ function renderNodeCard(node) {
 }
 
 const academicClusters = {
+  'exponential-function': '数学',
+  logarithm: '数学',
   matrix: '数学',
   'linear-algebra': '数学',
+  'differential-equation': '数学',
   fourier: '数学',
   optimization: '数学',
   mechanics: '物理',
   fluid: '物理',
+  'navier-stokes': '物理',
   magnus: '物理',
   'data-analysis': '情報・AI',
   'signal-processing': '情報・AI',
@@ -109,6 +113,8 @@ const schoolRoutes = {
   coordinates: [['中学校', '中1・数学']],
   equation: [['中学校', '中1・数学'], ['中学校', '中2・数学'], ['中学校', '中3・数学']],
   function: [['中学校', '中1・数学'], ['中学校', '中2・数学'], ['中学校', '中3・数学'], ['高校', '高校・数学I']],
+  'exponential-function': [['高校', '高校・数学II']],
+  logarithm: [['高校', '高校・数学II']],
   probability: [['中学校', '中2・数学'], ['高校', '高校・数学A']],
   statistics: [['中学校', '中2・数学'], ['中学校', '中3・数学'], ['高校', '高校・数学I']],
   pythagorean: [['中学校', '中3・数学']],
@@ -159,7 +165,9 @@ const explorerMeta = {
 function explorerPaths(kind) {
   const nodes = kind === 'interest'
     ? knowledge.nodes.filter((node) => ['interest', 'technology', 'career'].includes(node.kind))
-    : knowledge.nodes.filter((node) => node.kind === kind);
+    : kind === 'academic'
+      ? knowledge.nodes.filter((node) => node.kind === 'academic' || academicClusters[node.id])
+      : knowledge.nodes.filter((node) => node.kind === kind);
   if (kind === 'school') {
     return nodes.flatMap((node) => (schoolRoutes[node.id] || []).map(([stage, course]) => ({
       labels: [stage, course],
