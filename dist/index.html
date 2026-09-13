@@ -39,13 +39,21 @@
     </footer>
 
     <template id="home-template">
-      <section class="intro-shell">
-        <div class="intro-copy">
-          <p class="eyebrow">KNOWLEDGE PATHS</p>
-          <h1>いま習っていることは、<br /><em>どこへ続く？</em></h1>
-          <p class="intro-text">学校の勉強から未来へ。好きなことから学校へ。気になる言葉を選んで、つながりをたどってみよう。</p>
-          <div class="featured-paths" id="featured-paths" aria-label="おすすめの経路"></div>
+      <section class="map-stage" aria-labelledby="map-title">
+        <div class="map-stage-heading">
+          <div>
+            <p class="eyebrow">KNOWLEDGE MAP</p>
+            <h1 id="map-title">勉強の先を、<em>地図で眺める。</em></h1>
+          </div>
+          <p>学校で習うことから、技術や好きなものまで。代表的な3本の道筋を、つながる理由と一緒に並べました。</p>
         </div>
+        <div class="map-legend" aria-label="ノードの種類">
+          <span data-kind="school">学校</span><span data-kind="academic">学問</span><span data-kind="technology">技術</span><span data-kind="interest">興味</span>
+        </div>
+        <div class="overview-maps" id="overview-maps"></div>
+      </section>
+
+      <section class="path-tool-section">
         <div class="route-finder" aria-labelledby="route-title">
           <div class="route-heading">
             <span class="route-icon" aria-hidden="true">↗</span>

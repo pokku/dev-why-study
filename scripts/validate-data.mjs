@@ -40,6 +40,15 @@ for (const path of data.featuredPaths ?? []) {
     const linked = data.edges.some((edge) => (edge.from === from && edge.to === to) || (edge.from === to && edge.to === from));
     if (!linked) problems.push(`代表経路が途切れている: ${from} -> ${to}`);
   }
+  for (const branch of path.branches ?? []) {
+    if (!ids.has(branch.from)) problems.push(`枝の起点が存在しない: ${branch.from}`);
+    for (const id of branch.nodes) {
+      if (!ids.has(id)) problems.push(`枝に存在しないノード: ${id}`);
+      const linked = data.edges.some((edge) =>
+        (edge.from === branch.from && edge.to === id) || (edge.from === id && edge.to === branch.from));
+      if (!linked) problems.push(`枝がつながっていない: ${branch.from} -> ${id}`);
+    }
+  }
 }
 
 const neighbors = new Map([...ids].map((id) => [id, []]));

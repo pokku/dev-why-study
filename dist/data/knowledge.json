@@ -189,8 +189,32 @@
     { "from": "image-recognition", "to": "smartphone", "type": "usedIn", "reason": "顔認証、写真整理、カメラ補正などに使われる。" }
   ],
   "featuredPaths": [
-    { "label": "割合からAIへ続く代表経路", "nodes": ["ratio", "statistics", "data-analysis", "machine-learning", "ai"] },
-    { "label": "三角関数からWi‑Fiへ続く代表経路", "nodes": ["trigonometry", "wave", "fourier", "signal-processing", "ofdm", "wifi"] },
-    { "label": "野球の変化球を物理へ戻る代表経路", "nodes": ["baseball", "breaking-ball", "magnus", "fluid", "rotation", "mechanics"] }
+    {
+      "label": "割合からAIへ続く代表経路",
+      "nodes": ["ratio", "statistics", "data-analysis", "machine-learning", "ai"],
+      "branches": [
+        { "from": "statistics", "nodes": ["probability", "data-scientist"] },
+        { "from": "machine-learning", "nodes": ["linear-algebra", "optimization", "neural-network"] }
+      ]
+    },
+    {
+      "label": "三角関数からWi‑Fiへ続く代表経路",
+      "nodes": ["trigonometry", "wave", "fourier", "signal-processing", "ofdm", "wifi"],
+      "branches": [
+        { "from": "wave", "nodes": ["music", "electromagnetism"] },
+        { "from": "signal-processing", "nodes": ["communication-engineering"] },
+        { "from": "wifi", "nodes": ["smartphone"] }
+      ]
+    },
+    {
+      "label": "野球の変化球を物理へ戻る代表経路",
+      "nodes": ["baseball", "breaking-ball", "magnus", "fluid", "rotation", "mechanics", "motion", "force"],
+      "branches": [
+        { "from": "baseball", "nodes": ["statistics", "probability"] },
+        { "from": "mechanics", "nodes": ["calculus", "game-physics"] },
+        { "from": "motion", "nodes": ["speed"] },
+        { "from": "force", "nodes": ["vector"] }
+      ]
+    }
   ]
 }

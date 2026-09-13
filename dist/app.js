@@ -125,6 +125,104 @@ function findPath(from, to) {
   return null;
 }
 
+function relationBetween(from, to) {
+  const edge = knowledge.edges.find((item) =>
+    (item.from === from && item.to === to) || (item.from === to && item.to === from));
+  if (!edge) return { label: 'つながる', reason: '' };
+  const meta = relationMeta[edge.type] || relationMeta.related;
+  return {
+    label: edge.from === from ? meta.forward : meta.reverse,
+    reason: edge.reason,
+  };
+}
+
+function renderOverviewMap(path, index) {
+  const article = document.createElement('article');
+  article.className = 'overview-map';
+  const heading = document.createElement('header');
+  heading.className = 'overview-map-heading';
+  const number = document.createElement('span');
+  number.textContent = `MAP 0${index + 1}`;
+  const title = document.createElement('h2');
+  const first = nodesById.get(path.nodes[0]);
+  const last = nodesById.get(path.nodes[path.nodes.length - 1]);
+  title.textContent = `${first?.name ?? ''}から${last?.name ?? ''}へ`;
+  const caption = document.createElement('p');
+  caption.textContent = path.label;
+  heading.append(number, title, caption);
+
+  const flow = document.createElement('div');
+  flow.className = 'map-flow';
+  path.nodes.forEach((id, stepIndex) => {
+    const node = nodesById.get(id);
+    if (!node) return;
+    const card = document.createElement('section');
+    card.className = 'map-node-card';
+    card.dataset.kind = node.kind;
+    const meta = document.createElement('small');
+    meta.textContent = `${kindMeta[node.kind]?.label ?? node.kind}・${node.curriculum}`;
+    const name = document.createElement('h3');
+    name.textContent = node.name;
+    const summary = document.createElement('p');
+    summary.textContent = node.summary;
+    const detail = document.createElement('a');
+    detail.href = `#node=${encodeURIComponent(node.id)}`;
+    detail.textContent = '周辺も見る';
+    card.append(meta, name, summary, detail);
+    flow.append(card);
+
+    if (stepIndex < path.nodes.length - 1) {
+      const relation = relationBetween(id, path.nodes[stepIndex + 1]);
+      const connector = document.createElement('div');
+      connector.className = 'map-connector';
+      const line = document.createElement('span');
+      line.setAttribute('aria-hidden', 'true');
+      const label = document.createElement('strong');
+      label.textContent = relation.label;
+      const reason = document.createElement('p');
+      reason.textContent = relation.reason;
+      connector.append(line, label, reason);
+      flow.append(connector);
+    }
+  });
+  article.append(heading, flow);
+  if (path.branches?.length) {
+    const branches = document.createElement('div');
+    branches.className = 'map-branches';
+    const branchesTitle = document.createElement('strong');
+    branchesTitle.className = 'map-branches-title';
+    branchesTitle.textContent = '枝分かれする知識';
+    branches.append(branchesTitle);
+    path.branches.forEach((branch) => {
+      const group = document.createElement('div');
+      group.className = 'map-branch-group';
+      const source = document.createElement('span');
+      source.className = 'map-branch-source';
+      source.textContent = nodesById.get(branch.from)?.name ?? branch.from;
+      group.append(source);
+      branch.nodes.forEach((id) => {
+        const node = nodesById.get(id);
+        if (!node) return;
+        const relation = relationBetween(branch.from, id);
+        const branchCard = document.createElement('div');
+        branchCard.className = 'map-branch-card';
+        branchCard.dataset.kind = node.kind;
+        const branchName = document.createElement('b');
+        branchName.textContent = node.name;
+        const branchRelation = document.createElement('small');
+        branchRelation.textContent = relation.label;
+        const branchReason = document.createElement('p');
+        branchReason.textContent = relation.reason;
+        branchCard.append(branchName, branchRelation, branchReason);
+        group.append(branchCard);
+      });
+      branches.append(group);
+    });
+    article.append(branches);
+  }
+  return article;
+}
+
 function displayPath(container, ids, note = 'つながりが短い順に見つけた経路です。') {
   container.replaceChildren();
   if (!ids) {
@@ -156,18 +254,8 @@ function renderHome() {
   app.replaceChildren(homeTemplate.content.cloneNode(true));
   document.title = 'どうして勉強しないといけないの？';
 
-  const featured = app.querySelector('#featured-paths');
-  knowledge.featuredPaths.forEach((path) => {
-    const label = path.nodes.map((id) => nodesById.get(id)?.name).filter(Boolean).join(' → ');
-    featured.append(makeButton('path-chip', label, () => {
-      const from = app.querySelector('#path-from');
-      const to = app.querySelector('#path-to');
-      from.value = path.nodes[0];
-      to.value = path.nodes[path.nodes.length - 1];
-      displayPath(app.querySelector('#path-result'), path.nodes, path.label);
-      app.querySelector('.route-finder').scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }));
-  });
+  const overviewMaps = app.querySelector('#overview-maps');
+  knowledge.featuredPaths.forEach((path, index) => overviewMaps.append(renderOverviewMap(path, index)));
 
   const entryConfig = [
     { key: 'school', symbol: '学', title: '学校から探す', text: '算数・数学・理科・物理・情報。いま習っていることの続きを見る。' },
@@ -202,6 +290,7 @@ function renderHome() {
   populateSelect(from, 'ratio');
   populateSelect(to, 'ai');
   app.querySelector('#find-path').addEventListener('click', () => displayPath(app.querySelector('#path-result'), findPath(from.value, to.value)));
+  displayPath(app.querySelector('#path-result'), knowledge.featuredPaths[0]?.nodes, '最初の例を表示しています。出発点と行き先は自由に変えられます。');
 }
 
 function applyFilter(key, scroll = false) {
