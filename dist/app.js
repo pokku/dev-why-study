@@ -254,11 +254,10 @@ function renderHome() {
     { key: 'interest', symbol: '◎', title: '興味から探す', text: 'AI、スマートフォン、ゲーム、野球など、好きなものから戻る。' },
   ];
   const entryGrid = app.querySelector('#entry-grid');
-  entryConfig.forEach((entry, index) => {
+  entryConfig.forEach((entry) => {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'entry-card';
-    button.dataset.number = `0${index + 1}`;
     button.innerHTML = `<span class="entry-symbol">${entry.symbol}</span><h2>${entry.title}</h2><p>${entry.text}</p><span class="entry-link">順にたどる →</span>`;
     button.addEventListener('click', () => renderExplorer(entry.key, [], true));
     entryGrid.append(button);
