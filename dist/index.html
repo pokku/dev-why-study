@@ -41,50 +41,23 @@
     </footer>
 
     <template id="home-template">
-      <section class="map-stage" aria-labelledby="map-title">
-        <div class="map-stage-heading">
-          <div>
-            <p class="eyebrow">KNOWLEDGE MAP</p>
-            <h1 id="map-title">勉強の先を、<em>地図で眺める。</em></h1>
-          </div>
-          <p>学校で習うことから、技術や好きなものまで。代表的な3本の道筋を、つながる理由と一緒に並べました。</p>
-        </div>
-        <div class="map-legend" aria-label="ノードの種類">
-          <span data-kind="school">学校</span><span data-kind="academic">学問</span><span data-kind="technology">技術</span><span data-kind="interest">興味</span>
-        </div>
-        <div class="overview-maps" id="overview-maps"></div>
-      </section>
-
-      <section class="path-tool-section">
-        <div class="route-finder" aria-labelledby="route-title">
-          <div class="route-heading">
-            <span class="route-icon" aria-hidden="true">↗</span>
-            <div><p class="micro-label">PATH FINDER</p><h2 id="route-title">2つの知識をつないでみる</h2></div>
-          </div>
-          <div class="route-controls">
-            <label>出発点<select id="path-from"></select></label>
-            <span class="route-arrow" aria-hidden="true">→</span>
-            <label>行き先<select id="path-to"></select></label>
-          </div>
-          <button class="primary-button" id="find-path" type="button">道筋を探す</button>
-          <div id="path-result" class="path-result" aria-live="polite"></div>
-        </div>
-      </section>
-
       <section class="entry-section" aria-labelledby="entry-title">
         <div class="section-heading">
-          <div><p class="micro-label">START ANYWHERE</p><h2 id="entry-title">どこから見てみる？</h2></div>
-          <p>入口は違っても、知識は同じ地図の上でつながっています。</p>
+          <div><p class="micro-label">CHOOSE AN ENTRANCE</p><h1 id="entry-title">どこから見てみる？</h1></div>
+          <p>入口を選び、段階を追ってテーマまで進むと、そこから知識の地図が広がります。</p>
         </div>
         <div class="entry-grid" id="entry-grid"></div>
       </section>
 
-      <section class="browse-section" id="browse-section" aria-labelledby="browse-title">
-        <div class="browse-heading">
-          <div><p class="micro-label">EXPLORE</p><h2 id="browse-title">知識を見渡す</h2></div>
-          <div class="filter-row" id="filter-row" role="group" aria-label="知識の絞り込み"></div>
+      <section class="explorer-section" id="explorer-section" aria-labelledby="explorer-title" hidden>
+        <div class="explorer-shell">
+          <nav class="explorer-breadcrumbs" id="explorer-breadcrumbs" aria-label="選択した道筋"></nav>
+          <div class="explorer-heading">
+            <div><p class="micro-label">FOLLOW THE CURRICULUM</p><h2 id="explorer-title">段階を選ぶ</h2></div>
+            <p id="explorer-guide"></p>
+          </div>
+          <div class="explorer-options" id="explorer-options"></div>
         </div>
-        <div id="node-grid" class="node-grid"></div>
       </section>
     </template>
     <script type="module" src="./app.js"></script>

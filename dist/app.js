@@ -78,182 +78,180 @@ function renderNodeCard(node) {
   return button;
 }
 
-function populateSelect(select, selectedId) {
-  const groups = new Map();
-  knowledge.nodes.forEach((node) => {
-    const group = node.kind;
-    if (!groups.has(group)) groups.set(group, []);
-    groups.get(group).push(node);
+const academicClusters = {
+  matrix: '数学',
+  'linear-algebra': '数学',
+  fourier: '数学',
+  optimization: '数学',
+  mechanics: '物理',
+  fluid: '物理',
+  magnus: '物理',
+  'data-analysis': '情報・AI',
+  'signal-processing': '情報・AI',
+  'information-theory': '情報・AI',
+  'computer-science': '情報・AI',
+  'machine-learning': '情報・AI',
+  'neural-network': '情報・AI',
+  'computer-graphics': '情報・AI',
+  'communication-engineering': '電気・通信',
+};
+
+const schoolRoutes = {
+  multiplication: [['小学校', '小2・算数'], ['小学校', '小3・算数']],
+  division: [['小学校', '小3・算数'], ['小学校', '小4・算数']],
+  fraction: [['小学校', '小3・算数'], ['小学校', '小4・算数'], ['小学校', '小5・算数'], ['小学校', '小6・算数']],
+  decimal: [['小学校', '小3・算数'], ['小学校', '小4・算数'], ['小学校', '小5・算数']],
+  ratio: [['小学校', '小5・算数']],
+  percentage: [['小学校', '小5・算数']],
+  proportion: [['小学校', '小6・算数']],
+  speed: [['小学校', '小5・算数'], ['小学校', '小6・算数']],
+  circle: [['小学校', '小6・算数'], ['中学校', '中1・数学'], ['中学校', '中3・数学']],
+  coordinates: [['中学校', '中1・数学']],
+  equation: [['中学校', '中1・数学'], ['中学校', '中2・数学'], ['中学校', '中3・数学']],
+  function: [['中学校', '中1・数学'], ['中学校', '中2・数学'], ['中学校', '中3・数学'], ['高校', '高校・数学I']],
+  probability: [['中学校', '中2・数学'], ['高校', '高校・数学A']],
+  statistics: [['中学校', '中2・数学'], ['中学校', '中3・数学'], ['高校', '高校・数学I']],
+  pythagorean: [['中学校', '中3・数学']],
+  atom: [['中学校', '中2・理科'], ['高校', '高校・化学']],
+  molecule: [['中学校', '中2・理科'], ['高校', '高校・化学']],
+  'chemical-reaction': [['中学校', '中2・理科'], ['高校', '高校・化学']],
+  cell: [['中学校', '中2・理科'], ['高校', '高校・生物']],
+  force: [['中学校', '中1・理科'], ['中学校', '中3・理科'], ['高校', '高校・物理']],
+  electricity: [['中学校', '中2・理科'], ['高校', '高校・物理']],
+  dna: [['中学校', '中3・理科'], ['高校', '高校・生物']],
+  programming: [['中学校', '中学・技術／情報'], ['高校', '高校・情報I']],
+  vector: [['高校', '高校・数学C']],
+  trigonometry: [['高校', '高校・数学II']],
+  calculus: [['高校', '高校・数学II'], ['高校', '高校・数学III']],
+  motion: [['高校', '高校・物理']],
+  rotation: [['高校', '高校・物理']],
+  wave: [['高校', '高校・物理']],
+  electromagnetism: [['高校', '高校・物理']],
+  binary: [['高校', '高校・情報I']],
+  algorithm: [['高校', '高校・情報I']],
+};
+
+const explorerMeta = {
+  school: {
+    label: '学校から探す',
+    steps: [
+      { title: '学校を選ぶ', guide: '小学校・中学校・高校から、いま学んでいる段階を選びます。' },
+      { title: '学年・科目を選ぶ', guide: 'カリキュラムに沿って、学年と科目を絞ります。' },
+      { title: '単元を選ぶ', guide: '単元を選ぶと、その知識からマインドマップが広がります。' },
+    ],
+  },
+  academic: {
+    label: '学問から探す',
+    steps: [
+      { title: '分野を選ぶ', guide: '数学・物理・情報・通信の大きな分野から入ります。' },
+      { title: 'テーマを選ぶ', guide: 'テーマを選ぶと、関連する基礎や応用が地図になります。' },
+    ],
+  },
+  interest: {
+    label: '興味から探す',
+    steps: [
+      { title: '興味のある分野を選ぶ', guide: '身近なものや好きなことから入口を選びます。' },
+      { title: 'テーマを選ぶ', guide: 'テーマを選ぶと、仕組みを支える知識へ戻れます。' },
+    ],
+  },
+};
+
+function explorerPaths(kind) {
+  const nodes = kind === 'interest'
+    ? knowledge.nodes.filter((node) => ['interest', 'technology', 'career'].includes(node.kind))
+    : knowledge.nodes.filter((node) => node.kind === kind);
+  if (kind === 'school') {
+    return nodes.flatMap((node) => (schoolRoutes[node.id] || []).map(([stage, course]) => ({
+      labels: [stage, course],
+      node,
+    })));
+  }
+  if (kind === 'academic') {
+    return nodes.map((node) => ({ labels: [academicClusters[node.id] || 'その他'], node }));
+  }
+  return nodes.map((node) => ({ labels: [node.field], node }));
+}
+
+function renderExplorer(kind, selection = [], shouldScroll = false) {
+  const section = app.querySelector('#explorer-section');
+  const breadcrumbs = app.querySelector('#explorer-breadcrumbs');
+  const options = app.querySelector('#explorer-options');
+  const heading = app.querySelector('#explorer-title');
+  const guide = app.querySelector('#explorer-guide');
+  const meta = explorerMeta[kind];
+  const paths = explorerPaths(kind).filter((path) => selection.every((value, index) => path.labels[index] === value));
+  const depth = selection.length;
+  const nextLabels = [...new Set(paths.map((path) => path.labels[depth]).filter(Boolean))];
+  const stepIndex = nextLabels.length ? depth : meta.steps.length - 1;
+
+  section.hidden = false;
+  breadcrumbs.replaceChildren();
+  options.replaceChildren();
+  heading.textContent = meta.steps[stepIndex].title;
+  guide.textContent = meta.steps[stepIndex].guide;
+
+  const root = makeButton('explorer-crumb', meta.label, () => renderExplorer(kind));
+  breadcrumbs.append(root);
+  selection.forEach((value, index) => {
+    const arrow = document.createElement('span');
+    arrow.textContent = '›';
+    breadcrumbs.append(arrow, makeButton('explorer-crumb', value, () => renderExplorer(kind, selection.slice(0, index + 1))));
   });
-  for (const [kind, nodes] of groups) {
-    const optgroup = document.createElement('optgroup');
-    optgroup.label = kindMeta[kind]?.label || kind;
-    nodes.sort((a, b) => a.name.localeCompare(b.name, 'ja')).forEach((node) => {
-      const option = document.createElement('option');
-      option.value = node.id;
-      option.textContent = node.name;
-      option.selected = node.id === selectedId;
-      optgroup.append(option);
+
+  if (nextLabels.length) {
+    const preferredOrder = ['小学校', '中学校', '高校', '数学', '物理', '情報・AI', '電気・通信'];
+    nextLabels.sort((a, b) => {
+      const aIndex = preferredOrder.indexOf(a);
+      const bIndex = preferredOrder.indexOf(b);
+      if (aIndex !== -1 || bIndex !== -1) return (aIndex === -1 ? 99 : aIndex) - (bIndex === -1 ? 99 : bIndex);
+      return a.localeCompare(b, 'ja', { numeric: true });
     });
-    select.append(optgroup);
-  }
-}
-
-function findPath(from, to) {
-  if (from === to) return [from];
-  const queue = [[from]];
-  const visited = new Set([from]);
-  while (queue.length) {
-    const path = queue.shift();
-    const current = path[path.length - 1];
-    const neighbors = connectedEdges(current).map((edge) => edge.from === current ? edge.to : edge.from);
-    for (const neighbor of neighbors) {
-      if (visited.has(neighbor)) continue;
-      const nextPath = [...path, neighbor];
-      if (neighbor === to) return nextPath;
-      visited.add(neighbor);
-      queue.push(nextPath);
-    }
-  }
-  return null;
-}
-
-function relationBetween(from, to) {
-  const edge = knowledge.edges.find((item) =>
-    (item.from === from && item.to === to) || (item.from === to && item.to === from));
-  if (!edge) return { label: 'つながる', reason: '' };
-  const meta = relationMeta[edge.type] || relationMeta.related;
-  return {
-    label: edge.from === from ? meta.forward : meta.reverse,
-    reason: edge.reason,
-  };
-}
-
-function renderOverviewMap(path, index) {
-  const article = document.createElement('article');
-  article.className = 'overview-map';
-  const heading = document.createElement('header');
-  heading.className = 'overview-map-heading';
-  const number = document.createElement('span');
-  number.textContent = `MAP 0${index + 1}`;
-  const title = document.createElement('h2');
-  const first = nodesById.get(path.nodes[0]);
-  const last = nodesById.get(path.nodes[path.nodes.length - 1]);
-  title.textContent = `${first?.name ?? ''}から${last?.name ?? ''}へ`;
-  const caption = document.createElement('p');
-  caption.textContent = path.label;
-  heading.append(number, title, caption);
-
-  const flow = document.createElement('div');
-  flow.className = 'map-flow';
-  path.nodes.forEach((id, stepIndex) => {
-    const node = nodesById.get(id);
-    if (!node) return;
-    const card = document.createElement('section');
-    card.className = 'map-node-card';
-    card.dataset.kind = node.kind;
-    const meta = document.createElement('small');
-    meta.textContent = `${kindMeta[node.kind]?.label ?? node.kind}・${node.curriculum}`;
-    const name = document.createElement('h3');
-    name.textContent = node.name;
-    const summary = document.createElement('p');
-    summary.textContent = node.summary;
-    const detail = document.createElement('a');
-    detail.href = `#node=${encodeURIComponent(node.id)}`;
-    detail.textContent = 'マップで広げる';
-    card.append(meta, name, summary, detail);
-    flow.append(card);
-
-    if (stepIndex < path.nodes.length - 1) {
-      const relation = relationBetween(id, path.nodes[stepIndex + 1]);
-      const connector = document.createElement('div');
-      connector.className = 'map-connector';
-      const line = document.createElement('span');
-      line.setAttribute('aria-hidden', 'true');
-      const label = document.createElement('strong');
-      label.textContent = relation.label;
-      const reason = document.createElement('p');
-      reason.textContent = relation.reason;
-      connector.append(line, label, reason);
-      flow.append(connector);
-    }
-  });
-  article.append(heading, flow);
-  if (path.branches?.length) {
-    const branches = document.createElement('div');
-    branches.className = 'map-branches';
-    const branchesTitle = document.createElement('strong');
-    branchesTitle.className = 'map-branches-title';
-    branchesTitle.textContent = '枝分かれする知識';
-    branches.append(branchesTitle);
-    path.branches.forEach((branch) => {
-      const group = document.createElement('div');
-      group.className = 'map-branch-group';
-      const source = document.createElement('span');
-      source.className = 'map-branch-source';
-      source.textContent = nodesById.get(branch.from)?.name ?? branch.from;
-      group.append(source);
-      branch.nodes.forEach((id) => {
-        const node = nodesById.get(id);
-        if (!node) return;
-        const relation = relationBetween(branch.from, id);
-        const branchCard = document.createElement('div');
-        branchCard.className = 'map-branch-card';
-        branchCard.dataset.kind = node.kind;
-        const branchName = document.createElement('b');
-        branchName.textContent = node.name;
-        const branchRelation = document.createElement('small');
-        branchRelation.textContent = relation.label;
-        const branchReason = document.createElement('p');
-        branchReason.textContent = relation.reason;
-        branchCard.append(branchName, branchRelation, branchReason);
-        group.append(branchCard);
-      });
-      branches.append(group);
+    nextLabels.forEach((label) => {
+      const matching = paths.filter((path) => path.labels[depth] === label);
+      const uniqueNodes = new Set(matching.map((path) => path.node.id)).size;
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'explorer-choice';
+      const name = document.createElement('strong');
+      name.textContent = label;
+      const count = document.createElement('span');
+      count.textContent = `${uniqueNodes}単元`;
+      button.append(name, count);
+      button.addEventListener('click', () => renderExplorer(kind, [...selection, label]));
+      options.append(button);
     });
-    article.append(branches);
+  } else {
+    const uniqueNodes = [...new Map(paths.map((path) => [path.node.id, path.node])).values()];
+    uniqueNodes.forEach((node) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'explorer-topic';
+      button.dataset.kind = node.kind;
+      const text = document.createElement('span');
+      const name = document.createElement('strong');
+      name.textContent = node.name;
+      const summary = document.createElement('small');
+      summary.textContent = node.summary;
+      text.append(name, summary);
+      const open = document.createElement('i');
+      open.textContent = '地図を開く →';
+      button.append(text, open);
+      button.addEventListener('click', () => navigateToNode(node.id));
+      options.append(button);
+    });
   }
-  return article;
-}
 
-function displayPath(container, ids, note = 'つながりが短い順に見つけた経路です。') {
-  container.replaceChildren();
-  if (!ids) {
-    const message = document.createElement('p');
-    message.className = 'path-note';
-    message.textContent = 'この2つを結ぶ経路は、まだ登録されていません。';
-    container.append(message);
-    return;
-  }
-  const trail = document.createElement('div');
-  trail.className = 'path-trail';
-  ids.forEach((id, index) => {
-    const node = nodesById.get(id);
-    if (!node) return;
-    trail.append(makeButton('', node.name, () => navigateToNode(id)));
-    if (index < ids.length - 1) {
-      const arrow = document.createElement('span');
-      arrow.textContent = '→';
-      trail.append(arrow);
-    }
-  });
-  const caption = document.createElement('p');
-  caption.className = 'path-note';
-  caption.textContent = note;
-  container.append(trail, caption);
+  if (shouldScroll) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function renderHome() {
   app.replaceChildren(homeTemplate.content.cloneNode(true));
   document.title = 'どうして勉強しないといけないの？';
 
-  const overviewMaps = app.querySelector('#overview-maps');
-  knowledge.featuredPaths.forEach((path, index) => overviewMaps.append(renderOverviewMap(path, index)));
-
   const entryConfig = [
-    { key: 'school', symbol: '学', title: '学校から探す', text: '算数・数学・理科・物理・情報。いま習っていることの続きを見る。' },
-    { key: 'academic', symbol: '∑', title: '学問から探す', text: '数学、物理学、情報科学、工学。専門分野の前後をたどる。' },
-    { key: 'interest', symbol: '◎', title: '興味から探す', text: 'AI、スマートフォン、ゲーム、野球。好きなものの仕組みへ戻る。' },
+    { key: 'school', symbol: '学', title: '学校から探す', text: '小学校・中学校・高校から、学年と科目、単元の順にたどる。' },
+    { key: 'academic', symbol: '∑', title: '学問から探す', text: '数学・物理・情報・通信の分野から、知りたいテーマを選ぶ。' },
+    { key: 'interest', symbol: '◎', title: '興味から探す', text: 'AI、スマートフォン、ゲーム、野球など、好きなものから戻る。' },
   ];
   const entryGrid = app.querySelector('#entry-grid');
   entryConfig.forEach((entry, index) => {
@@ -261,42 +259,10 @@ function renderHome() {
     button.type = 'button';
     button.className = 'entry-card';
     button.dataset.number = `0${index + 1}`;
-    button.innerHTML = `<span class="entry-symbol">${entry.symbol}</span><h3>${entry.title}</h3><p>${entry.text}</p><span class="entry-link">見てみる →</span>`;
-    button.addEventListener('click', () => applyFilter(entry.key, true));
+    button.innerHTML = `<span class="entry-symbol">${entry.symbol}</span><h2>${entry.title}</h2><p>${entry.text}</p><span class="entry-link">順にたどる →</span>`;
+    button.addEventListener('click', () => renderExplorer(entry.key, [], true));
     entryGrid.append(button);
   });
-
-  const filters = [
-    { key: 'all', label: 'すべて' },
-    { key: 'school', label: '学校' },
-    { key: 'academic', label: '学問' },
-    { key: 'technology', label: '技術' },
-    { key: 'interest', label: '興味' },
-    { key: 'career', label: '仕事' },
-  ];
-  const filterRow = app.querySelector('#filter-row');
-  filters.forEach((filter) => filterRow.append(makeButton(`filter-button${filter.key === 'all' ? ' active' : ''}`, filter.label, () => applyFilter(filter.key))));
-  renderNodeGrid('all');
-
-  const from = app.querySelector('#path-from');
-  const to = app.querySelector('#path-to');
-  populateSelect(from, 'ratio');
-  populateSelect(to, 'ai');
-  app.querySelector('#find-path').addEventListener('click', () => displayPath(app.querySelector('#path-result'), findPath(from.value, to.value)));
-  displayPath(app.querySelector('#path-result'), knowledge.featuredPaths[0]?.nodes, '最初の例を表示しています。出発点と行き先は自由に変えられます。');
-}
-
-function applyFilter(key, scroll = false) {
-  app.querySelectorAll('.filter-button').forEach((button) => button.classList.toggle('active', button.textContent === ({ all: 'すべて', school: '学校', academic: '学問', technology: '技術', interest: '興味', career: '仕事' }[key])));
-  renderNodeGrid(key);
-  if (scroll) app.querySelector('#browse-section').scrollIntoView({ behavior: 'smooth' });
-}
-
-function renderNodeGrid(kind) {
-  const grid = app.querySelector('#node-grid');
-  grid.replaceChildren();
-  const nodes = kind === 'all' ? knowledge.nodes : knowledge.nodes.filter((node) => node.kind === kind);
-  nodes.forEach((node) => grid.append(renderNodeCard(node)));
 }
 
 function buildMindMap(rootId, limit = 15) {
