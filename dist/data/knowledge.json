@@ -108,7 +108,11 @@
     {"id":"double-slit-interference","name":"二重スリットの干渉","summary":"2つの細い隙間を通った光が重なり、明暗の縞を作る。","kind":"academic","level":"university","curriculum":"体験から学ぶ数学・物理・情報","field":"物理"},
     {"id":"electromagnetic-induction","name":"電磁誘導","summary":"コイルを貫く磁束の変化によって起電力が生じる現象。","kind":"academic","level":"university","curriculum":"体験から学ぶ数学・物理・情報","field":"物理"},
     {"id":"thin-lens","name":"薄いレンズと結像","summary":"焦点距離と物体の距離から実像や虚像の位置を求める。","kind":"academic","level":"university","curriculum":"体験から学ぶ数学・物理・情報","field":"物理"},
-    {"id":"monte-carlo-method","name":"モンテカルロ法","summary":"ランダムな試行を繰り返し、確率を使って値を近似する方法。","kind":"academic","level":"university","curriculum":"体験から学ぶ数学・物理・情報","field":"数学"}
+    {"id":"monte-carlo-method","name":"モンテカルロ法","summary":"ランダムな試行を繰り返し、確率を使って値を近似する方法。","kind":"academic","level":"university","curriculum":"体験から学ぶ数学・物理・情報","field":"数学"},
+    {"id":"camera","name":"カメラ","summary":"レンズで光を集め、像をセンサーで記録する。ピント、波長、画像の記録がつながる身近な機器。","kind":"technology","level":"applied","curriculum":"身近な光学・情報技術","field":"光学・情報"},
+    {"id":"noise-cancelling","name":"ノイズキャンセリング","summary":"耳の位置で騒音を弱めるように音を作る技術。波の重ね合わせと信号処理が関わる。","kind":"technology","level":"applied","curriculum":"身近な音響技術","field":"音響"},
+    {"id":"electric-generator","name":"発電機","summary":"磁束の変化による電磁誘導を使って、機械的なエネルギーを電気へ変換する機器。","kind":"technology","level":"applied","curriculum":"身近な電気・エネルギー","field":"電気"},
+    {"id":"digital-audio","name":"デジタル録音","summary":"音の信号を一定間隔で読み取り、数値として記録する。標本化と量子化によって表す。","kind":"technology","level":"applied","curriculum":"身近な情報技術","field":"情報・音響"}
   ],
   "edges": [
     { "from": "multiplication", "to": "division", "type": "related", "reason": "掛け算と割り算は互いに逆の計算として量の関係を扱う。" },
@@ -325,7 +329,26 @@
     {"from":"wave","to":"thin-lens","type":"develops","reason":"光の進む向きが屈折で変わり、レンズを通った光が像を作る。"},
     {"from":"fraction","to":"thin-lens","type":"toolFor","reason":"焦点距離・物体距離・像距離の逆数の関係を使う。"},
     {"from":"probability","to":"monte-carlo-method","type":"develops","reason":"ランダムな試行の割合から、面積や値を推定する。"},
-    {"from":"ratio","to":"monte-carlo-method","type":"toolFor","reason":"円内の点数を全点数で割った割合を、面積の比と対応させる。"}
+    {"from":"ratio","to":"monte-carlo-method","type":"toolFor","reason":"円内の点数を全点数で割った割合を、面積の比と対応させる。"},
+    {"from":"thin-lens","to":"camera","type":"usedIn","reason":"レンズで作る像が撮像面に重なるように、位置関係を調整してピントを合わせる。"},
+    {"from":"sensor","to":"camera","type":"usedIn","reason":"撮像センサーが、レンズを通って届いた光を電気的な信号に変える。"},
+    {"from":"compression","to":"camera","type":"usedIn","reason":"撮影した画像は、JPEGなどで情報量を抑えて保存できる。"},
+    {"from":"camera","to":"smartphone","type":"example","reason":"スマートフォンのカメラにも、レンズと撮像センサーが組み込まれている。"},
+    {"from":"interference","to":"noise-cancelling","type":"toolFor","reason":"耳の位置で騒音と逆向きの音を重ね、振動を弱める原理を使う。"},
+    {"from":"signal-processing","to":"noise-cancelling","type":"usedIn","reason":"マイクの信号を処理して、騒音を弱めるための音を計算する。"},
+    {"from":"electromagnetic-induction","to":"electric-generator","type":"usedIn","reason":"回転などでコイルを貫く磁束を変え、起電力を生む。"},
+    {"from":"electric-generator","to":"electricity","type":"related","reason":"発電機は、電気として利用するエネルギーを他の形から変換する機器の一つ。"},
+    {"from":"sampling-theorem","to":"digital-audio","type":"toolFor","reason":"記録したい周波数に合わせて、音を読み取る回数と帯域制限を決める。"},
+    {"from":"digital-audio","to":"music","type":"usedIn","reason":"演奏の音を数値で記録し、再生や編集を行う。"},
+    {"from":"digital-audio","to":"compression","type":"related","reason":"音を数値として記録した後、用途に応じて圧縮して保存・配信することがある。"},
+    {"from":"fourier-winding","to":"sound-harmonics","type":"related","reason":"波を巻いて平均する操作で、音に含まれる整数倍の周波数成分を検出できる。"},
+    {"from":"sampling-theorem","to":"image-frequency","type":"related","reason":"画像を格子で記録するときも、格子に対して細かすぎる模様は別の模様と区別できなくなる。"},
+    {"from":"fourier","to":"heat-equation","type":"toolFor","reason":"適切な境界条件では温度分布を波の成分に分け、成分ごとの減衰として熱の広がりを調べられる。"},
+    {"from":"beats","to":"interference","type":"example","reason":"近い周波数の波が重なり、強め合いと弱め合いがゆっくり繰り返される。"},
+    {"from":"resonance","to":"guitar","type":"related","reason":"弦だけでなく楽器の胴などの振動特性も、音の響きに関わる。"},
+    {"from":"doppler-effect","to":"sampling-theorem","type":"related","reason":"音源の運動で変わる音の周波数と、離散的に記録して見える周波数は別の仕組み。比較すると物理的な変化と記録の効果を区別できる。"},
+    {"from":"monte-carlo-method","to":"circle","type":"toolFor","reason":"円と正方形の面積比を、ランダムな点が入る割合から推定できる。"},
+    {"from":"statistics","to":"monte-carlo-method","type":"toolFor","reason":"試行回数と推定のばらつきを、統計的な考え方で評価する。"}
   ],
   "featuredPaths": [
     {

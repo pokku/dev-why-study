@@ -1,7 +1,9 @@
 import { formulas, scenes, formulaMarkup } from './discoveries.js';
 import { createStringLab } from './string-lab.js';
 import { labs } from './lab-catalog.js';
-import { createLabGallery, createScienceLab } from './science-labs.js';
+import { createScienceLab } from './science-labs.js';
+import { createHomePortal, createJourney, createLearningLibrary, createNotebook, attachLearning } from './learning-ui.js';
+import { journeys, matchLabs } from './learning-data.js';
 import { createRadioLab } from './radio-labs.js';
 import { createSoundLab } from './sound-labs.js';
 import { createExploreLab } from './explore-labs.js';
@@ -352,6 +354,7 @@ function renderHome() {
     entryGrid.append(button);
   });
   const requested = new URLSearchParams(location.hash.slice(1)).get('explore');
+  if (!requested) app.prepend(createHomePortal());
   renderExplorer(explorerMeta[requested] ? requested : 'formula', [], Boolean(requested));
   const invitation = document.createElement('a');
   invitation.className = 'lab-invitation';
@@ -612,7 +615,13 @@ function updateSearch() {
     const formula = formulas.find((item) => item.nodeId === node.id);
     return normalize(`${node.name} ${node.summary} ${node.field} ${formula?.spoken || ''}`).includes(query);
   }).slice(0, 8);
-  if (!matches.length) {
+  const experiments = matchLabs(labs, searchInput.value).slice(0, 4);
+  const routes = journeys.filter(j => normalize(`${j.title} ${j.intro} ${j.school}`).includes(query)).slice(0, 2);
+  for (const item of [...experiments.map(l => ({title:l.title,hash:`#lab=${l.id}`,type:'触って確かめる体験'})), ...routes.map(j => ({title:j.title,hash:`#journey=${j.id}`,type:'疑問をたどるルート'}))]) {
+    const b = makeButton('search-result', item.title, () => { location.hash=item.hash; searchInput.value=''; searchResults.hidden=true; });
+    const meta = document.createElement('small'); meta.textContent=item.type; b.append(meta); searchResults.append(b);
+  }
+  if (!matches.length && !experiments.length && !routes.length) {
     const empty = document.createElement('div');
     empty.className = 'search-result';
     empty.textContent = '一致する知識が見つかりません';
@@ -636,8 +645,17 @@ function updateSearch() {
 function renderRoute() {
   if (disposeLab) { disposeLab(); disposeLab = null; }
   const route = new URLSearchParams(location.hash.slice(1));
+  const activeEntrance = route.has('lab') || route.has('labs') ? '#labs' : route.has('notebook') ? '#notebook' : route.has('explore') ? `#explore=${route.get('explore')}` : route.has('node') ? null : '#';
+  document.querySelectorAll('.learning-global-nav a').forEach(a => { if (a.getAttribute('href') === activeEntrance) a.setAttribute('aria-current','true'); else a.removeAttribute('aria-current'); });
+  if (route.has('notebook') || (route.has('journey') && !route.has('lab'))) {
+    const page = route.has('notebook') ? createNotebook() : createJourney(route.get('journey'));
+    if (!page) return renderNotFound();
+    app.replaceChildren(page);
+    document.title = `${route.has('notebook') ? '発見ノート' : journeys.find(j=>j.id===route.get('journey')).title}｜どうして勉強しないといけないの？`;
+    window.scrollTo({top:0,behavior:'instant'}); app.focus({preventScroll:true}); return;
+  }
   if (route.has('labs')) {
-    app.replaceChildren(createLabGallery());
+    app.replaceChildren(createLearningLibrary());
     document.title = '触ってわかる体験一覧｜どうして勉強しないといけないの？';
     window.scrollTo({ top: 0, behavior: 'instant' });
     app.focus({ preventScroll: true });
@@ -648,6 +666,7 @@ function renderRoute() {
     if (!definition) return renderNotFound();
     const lab = definition.id === 'string' ? createStringLab() : definition.renderer === 'explore' ? createExploreLab(definition.id, nodesById) : definition.renderer === 'sound' ? createSoundLab(definition.id, nodesById) : definition.renderer === 'radio' ? createRadioLab(definition.id, nodesById) : createScienceLab(definition.id, nodesById);
     disposeLab = lab.dispose;
+    attachLearning(lab.element, definition.id, route.get('journey'), nodesById);
     app.replaceChildren(lab.element);
     document.title = `${definition.title}｜どうして勉強しないといけないの？`;
     window.scrollTo({ top: 0, behavior: 'instant' });

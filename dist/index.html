@@ -22,12 +22,15 @@
         <span>どうして勉強しないといけないの？</span>
       </button>
       <div class="header-search">
-        <label class="sr-only" for="global-search">知識を検索</label>
+        <label class="sr-only" for="global-search">知識・体験・探索ルートを検索</label>
         <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m16 16 4 4"></path></svg>
-        <input id="global-search" type="search" placeholder="E=mc²、波、AI、野球…" autocomplete="off" />
+        <input id="global-search" type="search" placeholder="音色、電波、数式、勉強…" autocomplete="off" />
         <div id="search-results" class="search-results" hidden></div>
       </div>
     </header>
+    <nav class="learning-global-nav" aria-label="主な入口">
+      <a href="#">探索ルート</a><a href="#labs">体験を探す</a><a href="#explore=formula">数式から</a><a href="#explore=school">学校から</a><a href="#notebook">発見ノート</a>
+    </nav>
 
     <main id="app" tabindex="-1">
       <div class="loading-state" role="status">
@@ -43,7 +46,7 @@
     <template id="home-template">
       <section class="entry-section" aria-labelledby="entry-title">
         <div class="section-heading">
-          <div><p class="micro-label">CHOOSE AN ENTRANCE</p><h1 id="entry-title">どこから見てみる？</h1></div>
+          <div><p class="micro-label">CHOOSE AN ENTRANCE</p><h2 id="entry-title">数式や知識からも、自由に探そう。</h2></div>
           <p>かっこいい式、不思議な図。その先は、いつもの暮らしと、学校で習うことにつながっています。</p>
         </div>
         <div class="entry-grid" id="entry-grid"></div>

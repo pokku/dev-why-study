@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { formulas, scenes } from '../dist/discoveries.js';
 import { labs } from '../dist/lab-catalog.js';
+import { journeys, learning, everydayLinks } from '../dist/learning-data.js';
 
 const source = new URL('../dist/data/knowledge.json', import.meta.url);
 const data = JSON.parse(await readFile(source, 'utf8'));
@@ -38,6 +39,22 @@ for (const lab of labs) {
   }
 }
 const labSource = await readFile(new URL('../dist/string-lab.js', import.meta.url), 'utf8');
+const routeIds = new Set();
+for (const journey of journeys) {
+  if (routeIds.has(journey.id)) problems.push(`探索ルートIDの重複: ${journey.id}`);
+  routeIds.add(journey.id);
+  for (const [lab,question] of journey.steps) if (!labIds.has(lab) || !question) problems.push(`探索ルートの参照不正: ${journey.id}/${lab}`);
+}
+for (const lab of labs) {
+  const entry = learning[lab.id];
+  if (!everydayLinks[lab.id] || !ids.has(everydayLinks[lab.id][0])) problems.push(`身近な世界の参照不正: ${lab.id}`);
+  if (!entry || entry.length !== 6 || entry.some(item=>!item)) problems.push(`体験の学習ガイド不足: ${lab.id}`);
+  else {
+    if (!ids.has(entry[3])) problems.push(`学習ガイドの知識参照不正: ${lab.id}/${entry[3]}`);
+    if (!labIds.has(entry[4]) || entry[4] === lab.id) problems.push(`次の疑問の参照不正: ${lab.id}`);
+  }
+  if (!journeys.some(j=>j.steps.some(([id])=>id===lab.id))) problems.push(`探索ルートに登場しない体験: ${lab.id}`);
+}
 for (const [, id] of labSource.matchAll(/href="#node=([a-z0-9-]+)"/g)) {
   if (!ids.has(id)) problems.push(`弦の体験からのリンク先が存在しない: ${id}`);
 }
@@ -122,3 +139,4 @@ if (problems.length) {
 console.log(`OK: ${ids.size} nodes, ${data.edges.length} edges, ${data.featuredPaths.length} featured paths`);
 console.log(`OK: ${formulas.length} formulas, ${scenes.length} science illustrations, discovery paths connected`);
 console.log(`OK: ${labIds.size} interactive experiences, links and controls checked`);
+console.log(`OK: ${journeys.length} learning journeys, every experiment has a mission and a next question`);
