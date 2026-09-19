@@ -1,4 +1,5 @@
 import { readFile } from 'node:fs/promises';
+import { formulas, scenes } from '../dist/discoveries.js';
 
 const source = new URL('../dist/data/knowledge.json', import.meta.url);
 const data = JSON.parse(await readFile(source, 'utf8'));
@@ -28,6 +29,28 @@ for (const edge of data.edges ?? []) {
 const connected = new Set(data.edges.flatMap((edge) => [edge.from, edge.to]));
 for (const id of ids) {
   if (!connected.has(id)) problems.push(`孤立したノード: ${id}`);
+}
+
+const formulaIds = new Set();
+const linked = (a, b) => data.edges.some((edge) =>
+  (edge.from === a && edge.to === b) || (edge.from === b && edge.to === a));
+for (const formula of formulas) {
+  if (formulaIds.has(formula.nodeId)) problems.push(`重複した公式: ${formula.nodeId}`);
+  formulaIds.add(formula.nodeId);
+  if (!ids.has(formula.nodeId) || !formula.expression || !formula.spoken || !formula.symbols || !formula.condition) problems.push(`公式の情報不足: ${formula.nodeId}`);
+  if (formula.trail[0] !== formula.nodeId) problems.push(`公式の経路の起点が不一致: ${formula.nodeId}`);
+  for (const id of [...formula.trail, ...formula.basics]) {
+    if (!ids.has(id)) problems.push(`公式からの参照先が存在しない: ${id}`);
+  }
+  formula.trail.slice(1).forEach((id, index) => {
+    if (!linked(formula.trail[index], id)) problems.push(`身近な世界への経路が途切れている: ${formula.nodeId} -> ${id}`);
+  });
+  for (const id of formula.basics) {
+    if (!linked(formula.nodeId, id)) problems.push(`学校の勉強との関係がない: ${formula.nodeId} -> ${id}`);
+  }
+}
+for (const scene of scenes) {
+  if (!formulaIds.has(scene.nodeId) || !scene.caption || !scene.image) problems.push(`科学の図の情報不足: ${scene.id}`);
 }
 
 for (const path of data.featuredPaths ?? []) {
@@ -83,3 +106,4 @@ if (problems.length) {
 }
 
 console.log(`OK: ${ids.size} nodes, ${data.edges.length} edges, ${data.featuredPaths.length} featured paths`);
+console.log(`OK: ${formulas.length} formulas, ${scenes.length} science illustrations, discovery paths connected`);

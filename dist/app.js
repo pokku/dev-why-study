@@ -1,3 +1,5 @@
+import { formulas, scenes, formulaMarkup } from './discoveries.js';
+
 const app = document.querySelector('#app');
 const homeTemplate = document.querySelector('#home-template');
 const searchInput = document.querySelector('#global-search');
@@ -23,6 +25,7 @@ const relationMeta = {
 
 let knowledge = { nodes: [], edges: [], featuredPaths: [] };
 let nodesById = new Map();
+let lastExplorer = 'formula';
 
 function navigateToNode(id) {
   location.hash = `node=${encodeURIComponent(id)}`;
@@ -79,6 +82,11 @@ function renderNodeCard(node) {
 }
 
 const academicClusters = {
+  'mass-energy': '物理',
+  'wave-equation': '物理',
+  'maxwell-equations': '電気・通信',
+  'schrodinger-equation': '物理',
+  'nuclear-fusion': '物理',
   'exponential-function': '数学',
   logarithm: '数学',
   matrix: '数学',
@@ -101,6 +109,7 @@ const academicClusters = {
 };
 
 const schoolRoutes = {
+  'ohms-law': [['中学校', '中2・理科'], ['高校', '高校・物理']],
   multiplication: [['小学校', '小2・算数'], ['小学校', '小3・算数']],
   division: [['小学校', '小3・算数'], ['小学校', '小4・算数']],
   fraction: [['小学校', '小3・算数'], ['小学校', '小4・算数'], ['小学校', '小5・算数'], ['小学校', '小6・算数']],
@@ -138,6 +147,8 @@ const schoolRoutes = {
 };
 
 const explorerMeta = {
+  formula: { label: '公式・方程式から探す', steps: [{ title: 'この式、どこにつながる？', guide: 'まだ読めなくても大丈夫。気になる形を押して、身近な世界とのつながりを見てみよう。' }] },
+  science: { label: '科学の図から探す', steps: [{ title: 'この景色の向こうに、何がある？', guide: '波や流れの図から、現象を表す式、身近な技術、その土台の勉強へ。' }] },
   school: {
     label: '学校から探す',
     steps: [
@@ -162,6 +173,38 @@ const explorerMeta = {
   },
 };
 
+function makeFormulaVisual(formula) {
+  const visual = document.createElement('div');
+  visual.className = `formula-visual formula-${formula.nodeId}`;
+  visual.innerHTML = formulaMarkup(formula);
+  visual.querySelector('math').setAttribute('aria-label', formula.spoken);
+  return visual;
+}
+
+function renderDiscoveryCard(item, isFormula) {
+  const node = nodesById.get(item.nodeId);
+  const button = makeButton('discovery-card', '', () => navigateToNode(item.nodeId));
+  button.setAttribute('aria-label', `${isFormula ? node.name : item.title}のマップを開く`);
+  const art = isFormula ? makeFormulaVisual(item) : document.createElement('div');
+  if (!isFormula) { art.className = 'science-visual'; art.innerHTML = item.image; }
+  const text = document.createElement('div');
+  text.className = 'discovery-copy';
+  const title = document.createElement('h3');
+  title.textContent = isFormula ? node.name : item.title;
+  const hook = document.createElement('p');
+  hook.textContent = item.hook;
+  const link = document.createElement('span');
+  link.textContent = 'つながりを見にいく ↗';
+  text.append(title, hook, link);
+  if (!isFormula) {
+    const caption = document.createElement('small');
+    caption.textContent = item.caption;
+    text.append(caption);
+  }
+  button.append(art, text);
+  return button;
+}
+
 function explorerPaths(kind) {
   const nodes = kind === 'interest'
     ? knowledge.nodes.filter((node) => ['interest', 'technology', 'career'].includes(node.kind))
@@ -181,6 +224,7 @@ function explorerPaths(kind) {
 }
 
 function renderExplorer(kind, selection = [], shouldScroll = false) {
+  lastExplorer = kind;
   const section = app.querySelector('#explorer-section');
   const breadcrumbs = app.querySelector('#explorer-breadcrumbs');
   const options = app.querySelector('#explorer-options');
@@ -195,6 +239,11 @@ function renderExplorer(kind, selection = [], shouldScroll = false) {
   section.hidden = false;
   breadcrumbs.replaceChildren();
   options.replaceChildren();
+  const discovery = kind === 'formula' || kind === 'science';
+  options.classList.toggle('discovery-grid', discovery);
+  app.querySelectorAll('[data-entry]').forEach((button) => {
+    button.setAttribute('aria-pressed', String(button.dataset.entry === kind));
+  });
   heading.textContent = meta.steps[stepIndex].title;
   guide.textContent = meta.steps[stepIndex].guide;
 
@@ -206,7 +255,9 @@ function renderExplorer(kind, selection = [], shouldScroll = false) {
     breadcrumbs.append(arrow, makeButton('explorer-crumb', value, () => renderExplorer(kind, selection.slice(0, index + 1))));
   });
 
-  if (nextLabels.length) {
+  if (discovery) {
+    (kind === 'formula' ? formulas : scenes).forEach((item) => options.append(renderDiscoveryCard(item, kind === 'formula')));
+  } else if (nextLabels.length) {
     const preferredOrder = ['小学校', '中学校', '高校', '数学', '物理', '情報・AI', '電気・通信'];
     nextLabels.sort((a, b) => {
       const aIndex = preferredOrder.indexOf(a);
@@ -257,6 +308,8 @@ function renderHome() {
   document.title = 'どうして勉強しないといけないの？';
 
   const entryConfig = [
+    { key: 'formula', symbol: 'E=mc²', title: '公式・方程式から', text: '見覚えのある式。まだ読めない式。その先にある世界へ。' },
+    { key: 'science', symbol: '∿', title: '科学の図から', text: '波、風、振動。目に留まった図から、仕組みをたどる。' },
     { key: 'school', symbol: '学', title: '学校から探す', text: '小学校・中学校・高校から、学年と科目、単元の順にたどる。' },
     { key: 'academic', symbol: '∑', title: '学問から探す', text: '数学・物理・情報・通信の分野から、知りたいテーマを選ぶ。' },
     { key: 'interest', symbol: '◎', title: '興味から探す', text: 'AI、スマートフォン、ゲーム、野球など、好きなものから戻る。' },
@@ -266,10 +319,17 @@ function renderHome() {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'entry-card';
+    button.dataset.entry = entry.key;
     button.innerHTML = `<span class="entry-symbol">${entry.symbol}</span><h2>${entry.title}</h2><p>${entry.text}</p><span class="entry-link">順にたどる →</span>`;
-    button.addEventListener('click', () => renderExplorer(entry.key, [], true));
+    button.addEventListener('click', () => {
+      const hash = `#explore=${entry.key}`;
+      if (location.hash === hash) renderExplorer(entry.key, [], true);
+      else location.hash = hash;
+    });
     entryGrid.append(button);
   });
+  const requested = new URLSearchParams(location.hash.slice(1)).get('explore');
+  renderExplorer(explorerMeta[requested] ? requested : 'formula', [], Boolean(requested));
 }
 
 function buildMindMap(rootId, limit = 15) {
@@ -349,7 +409,7 @@ function renderMindMap(id) {
   page.className = 'mindmap-page';
   const toolbar = document.createElement('header');
   toolbar.className = 'mindmap-toolbar';
-  const back = makeButton('mindmap-back', '← テーマ一覧', () => { location.hash = ''; });
+  const back = makeButton('mindmap-back', '← 入口へ戻る', () => { location.hash = `explore=${lastExplorer}`; });
   const heading = document.createElement('div');
   const eyebrow = document.createElement('span');
   eyebrow.textContent = '2段先までを一望';
@@ -442,9 +502,44 @@ function renderMindMap(id) {
     button.append(relationHeading, reason);
     relationList.append(button);
   });
-  inspector.append(inspectorKind, inspectorTitle, summary, meta, relationTitle, relationList);
+  inspector.append(inspectorKind, inspectorTitle, summary);
+  const formula = formulas.find((item) => item.nodeId === id);
+  if (formula) {
+    inspector.append(makeFormulaVisual(formula));
+    const symbols = document.createElement('p');
+    symbols.className = 'formula-explanation';
+    symbols.textContent = formula.symbols;
+    const condition = document.createElement('p');
+    condition.className = 'formula-condition';
+    condition.textContent = formula.condition;
+    inspector.append(symbols, condition);
+  }
+  inspector.append(meta, relationTitle, relationList);
   layout.append(canvasWrap, inspector);
-  page.append(toolbar, layout);
+  page.append(toolbar);
+  if (formula) {
+    const discovery = document.createElement('section');
+    discovery.className = 'discovery-trail';
+    discovery.setAttribute('aria-label', '身近な世界と勉強のつながり');
+    const heading = document.createElement('strong');
+    heading.textContent = formula.hook;
+    discovery.append(heading);
+    for (const [label, ids] of [['身近な世界へ', formula.trail], ['学校の勉強へ', formula.basics]]) {
+      const line = document.createElement('div');
+      const caption = document.createElement('span');
+      caption.textContent = label;
+      line.append(caption);
+      ids.forEach((nodeId, index) => {
+        if (index) { const arrow = document.createElement('span'); arrow.textContent = label === '身近な世界へ' ? '→' : '・'; line.append(arrow); }
+        const button = makeButton('trail-node', nodesById.get(nodeId).name, () => navigateToNode(nodeId));
+        if (nodeId === id) { button.disabled = true; button.setAttribute('aria-current', 'true'); }
+        line.append(button);
+      });
+      discovery.append(line);
+    }
+    page.append(discovery);
+  }
+  page.append(layout);
   app.append(page);
   app.focus({ preventScroll: true });
 }
@@ -462,13 +557,17 @@ function renderNotFound() {
 }
 
 function updateSearch() {
-  const query = searchInput.value.trim().toLocaleLowerCase('ja');
+  const normalize = (value) => value.normalize('NFKC').replace(/[\s^]/g, '').toLocaleLowerCase('ja');
+  const query = normalize(searchInput.value.trim());
   searchResults.replaceChildren();
   if (!query) {
     searchResults.hidden = true;
     return;
   }
-  const matches = knowledge.nodes.filter((node) => `${node.name} ${node.summary} ${node.field}`.toLocaleLowerCase('ja').includes(query)).slice(0, 8);
+  const matches = knowledge.nodes.filter((node) => {
+    const formula = formulas.find((item) => item.nodeId === node.id);
+    return normalize(`${node.name} ${node.summary} ${node.field} ${formula?.spoken || ''}`).includes(query);
+  }).slice(0, 8);
   if (!matches.length) {
     const empty = document.createElement('div');
     empty.className = 'search-result';

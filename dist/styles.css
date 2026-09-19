@@ -304,6 +304,74 @@ footer p { margin: 0; display: flex; justify-content: space-between; gap: 20px; 
   footer p { flex-direction: column; }
 }
 
+/* Visual entrances: formulas are native MathML, scientific illustrations are local SVG. */
+.entry-section { padding-top: 42px; padding-bottom: 30px; }
+.entry-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+.entry-card { min-height: 216px; padding: 20px; padding-bottom: 48px; }
+.entry-card h2 { font-size: 1rem; margin-top: 16px; }
+.entry-card p { font-size: .76rem; }
+.entry-card .entry-link { left: 20px; bottom: 17px; font-size: .72rem; }
+.entry-card .entry-symbol { width: auto; min-width: 51px; display: inline-flex; padding: 0 10px; }
+.entry-card[aria-pressed="true"] { border-color: var(--blue); background: #f0f5ff; }
+.entry-card:nth-child(4) .entry-symbol { color: #6d51cf; background: #efeaff; }
+.entry-card:nth-child(5) .entry-symbol { color: #b34e64; background: #ffeaf0; }
+.discovery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.discovery-card { min-width: 0; overflow: hidden; padding: 0; color: var(--ink); background: #fff; border: 1px solid #d7dfeb; border-radius: 17px; text-align: left; cursor: pointer; transition: transform .2s, box-shadow .2s; }
+.discovery-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+.discovery-card:focus-visible, .entry-card:focus-visible, .trail-node:focus-visible { outline: 3px solid #2962ff; outline-offset: 4px; }
+.formula-visual, .science-visual { display: flex; align-items: center; justify-content: center; min-height: 215px; padding: 22px 12px; color: #b6e9ff; background: radial-gradient(ellipse at 80% 0, #203b61, #101d38 75%); overflow-x: auto; }
+.formula-visual math { margin: 0; font-family: 'Cambria Math', 'STIX Two Math', math; font-size: 2.7rem; }
+.formula-wave-equation math { font-size: 2rem; }
+.formula-navier-stokes math { font-size: 1.45rem; }
+.formula-maxwell-equations math { font-size: 1.3rem; }
+.formula-schrodinger-equation math { font-size: 1.6rem; }
+.discovery-card:nth-child(3n+2) .formula-visual { color: #8ff1d3; }
+.discovery-card:nth-child(3n) .formula-visual { color: #ffdc8c; }
+.science-visual { padding: 0; }
+.science-visual svg { display: block; width: 100%; height: auto; }
+.discovery-copy { padding: 21px; }
+.discovery-copy h3 { margin: 0 0 9px; font-size: 1.04rem; }
+.discovery-copy p { margin: 0 0 17px; color: #586880; font-size: .84rem; line-height: 1.65; }
+.discovery-copy > span { color: var(--blue); font-size: .76rem; font-weight: 700; }
+.discovery-copy small { display: block; margin-top: 16px; color: var(--muted); font-size: .68rem; line-height: 1.6; }
+.discovery-trail { flex: 0 0 auto; margin: 5px 0 12px; padding: 12px 16px; border-radius: 13px; background: #fff; border: 1px solid #d7dfeb; }
+.discovery-trail > strong { display: block; font-size: .9rem; margin-bottom: 7px; }
+.discovery-trail > div { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin-top: 4px; }
+.discovery-trail span { color: var(--muted); font-size: .66rem; }
+.discovery-trail > div > span:first-child { margin-right: 7px; font-weight: 700; }
+.trail-node { padding: 4px 8px; color: #2455b8; border: 0; border-radius: 6px; background: #edf3ff; font-size: .7rem; cursor: pointer; }
+.trail-node:disabled { color: #42506a; background: #edf0f4; cursor: default; }
+.mindmap-page:has(.discovery-trail) { height: auto; min-height: calc(100dvh - 74px); overflow: visible; }
+.mindmap-page:has(.discovery-trail) .mindmap-layout { flex: none; min-height: 470px; }
+.mindmap-inspector { overflow-y: auto; max-height: 70dvh; }
+.mindmap-inspector .formula-visual { min-height: 0; padding: 20px 0; justify-content: flex-start; background: none; }
+.mindmap-inspector .formula-visual math { margin-inline: auto; font-size: 1.7rem; }
+.mindmap-inspector .formula-navier-stokes math { font-size: 1.1rem; }
+.mindmap-inspector .formula-schrodinger-equation math { font-size: 1rem; }
+.mindmap-inspector .formula-maxwell-equations math { font-size: 1.15rem; }
+.formula-explanation, .formula-condition { margin: 0 0 12px; font-size: .73rem; line-height: 1.7; color: #c5d2e5; }
+.formula-condition { color: #a6b5cc; border-left: 2px solid #4b6489; padding-left: 9px; }
+.mindmap-inspector .inspector-relations { max-height: none; overflow: visible; }
+@media (max-width: 1100px) {
+  .entry-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .entry-card { min-height: 200px; }
+  .formula-navier-stokes math { font-size: 1.15rem; }
+  .formula-schrodinger-equation math { font-size: 1.15rem; }
+}
+@media (max-width: 720px) {
+  .entry-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .entry-card { min-height: 0; padding: 16px; }
+  .entry-card .entry-link { position: static; display: block; margin-top: 14px; }
+  .entry-card h2 { font-size: .93rem; }
+  .discovery-grid { grid-template-columns: minmax(0, 1fr); }
+  .formula-visual { min-height: 190px; }
+  .formula-navier-stokes math { font-size: clamp(1.1rem, 4vw, 1.45rem); }
+  .formula-schrodinger-equation math { font-size: clamp(1rem, 4vw, 1.6rem); }
+  .discovery-copy { padding: 17px; }
+  .mindmap-inspector { max-height: none; }
+  .discovery-trail { padding: 12px; }
+  .mindmap-page:has(.discovery-trail) .mindmap-layout { min-height: 0; }
+}
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
