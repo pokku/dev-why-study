@@ -21,4 +21,22 @@
 
 ## 表示確認の補足
 
+## 追加7体験（2026-09-19）
+
+各モデルと図は自作。外部教材のコード・画像は転載していない。
+
+- 屈折・分散: [OpenStax College Physics 25.5](https://openstax.org/books/college-physics/pages/25-5-dispersion-the-rainbow-and-prisms)、[IOP 色の分散](https://spark.iop.org/spectrum-colours-dispersion-light)。2面の屈折をスネルの法則で計算。屈折率は赤1.51から紫1.51+0.025×操作値の説明用モデル。
+- うなり: [UNSW Physclips Beats](https://www.animations.physics.unsw.edu.au/jw/beats.htm)。うなりの周波数は2音の周波数差。220Hzの2音を同一出力に重ね、同じ位相から開始する。
+- 軌道: [NASA Gravity & Mechanics](https://science.nasa.gov/learn/basics-of-space-flight/chapter3-4/)。中心天体を固定した重力のみの運動。中心天体の半径は初期距離の0.18倍で、衝突または距離6倍で計算停止。表示は軌跡の範囲に合わせて縮尺を変更する。
+- 共振・干渉: [PhET Wave Interference](https://phet.colorado.edu/en/simulations/wave-interference)。波の重ね合わせを学ぶ体験の参考。振り子は小振幅近似・長さ1.5m・減衰比0.06・周期外力振幅0.25 rad/s²の自作モデル。押す周期と固有周期を合わせた応答の違いを示す。
+- 熱: [MIT Heat Equation and Convection-Diffusion](https://ocw.mit.edu/courses/18-086-mathematical-methods-for-engineers-ii-spring-2006/5db29e69494eb09a26f7224d43adc6f6_am54.pdf)。2D陽解法の安定範囲を守り、外への流出がない境界で熱の総量を保存する。手動加熱は外部から熱を加える操作。
+- 画像: [SciPy DCTの定義](https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.dct.html)。正規直交DCT-IIを自作実装。画像全体の32×32変換であり、JPEGの8×8ブロック化・量子化・符号化の再現ではない。
+
+## 実機で確認すること
+
+- 全8体験のカードと各知識マップとの往復、戻る操作。
+- うなり・干渉の音量0、再生・停止、再生中に設定を変える／別画面に移る操作。
+- 軌道の円・低速衝突・高速投射、ブランコの同周期／ずれた周期、熱のタップ／中央加熱。
+- 画像の端末内読み込み・サンプル復帰・周波数1と32の比較。スマホ幅でのスライダー・図・説明文。
+
 buildは既存の知識グラフに加えて、公式・科学図の参照先、日常への経路の連結、学校の知識との直接の関係を検査する。ブラウザ表示はオーナーがdev Pagesで確認する。特にスマートフォンでの長い式、図、入口からマップへの遷移、戻る操作を確認する。

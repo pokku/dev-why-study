@@ -1,5 +1,7 @@
 import { formulas, scenes, formulaMarkup } from './discoveries.js';
 import { createStringLab } from './string-lab.js';
+import { labs } from './lab-catalog.js';
+import { createLabGallery, createScienceLab } from './science-labs.js';
 
 const app = document.querySelector('#app');
 const homeTemplate = document.querySelector('#home-template');
@@ -84,6 +86,8 @@ function renderNodeCard(node) {
 }
 
 const academicClusters = {
+  'heat-equation': '物理',
+  'image-frequency': '情報・AI',
   'mass-energy': '物理',
   'wave-equation': '物理',
   'maxwell-equations': '電気・通信',
@@ -111,6 +115,11 @@ const academicClusters = {
 };
 
 const schoolRoutes = {
+  dispersion: [['高校', '高校・物理']],
+  beats: [['高校', '高校・物理']],
+  gravity: [['高校', '高校・物理']],
+  resonance: [['高校', '高校・物理']],
+  interference: [['高校', '高校・物理']],
   'inverse-proportion': [['小学校', '小6・算数'], ['中学校', '中1・数学']],
   'ohms-law': [['中学校', '中2・理科'], ['高校', '高校・物理']],
   multiplication: [['小学校', '小2・算数'], ['小学校', '小3・算数']],
@@ -335,8 +344,8 @@ function renderHome() {
   renderExplorer(explorerMeta[requested] ? requested : 'formula', [], Boolean(requested));
   const invitation = document.createElement('a');
   invitation.className = 'lab-invitation';
-  invitation.href = '#lab=string';
-  invitation.innerHTML = '<span>触って、聞いて、わかる</span><strong>波動方程式から、ギターの音へ。</strong><span>弦の長さを変えて弾いてみる →</span>';
+  invitation.href = '#labs';
+  invitation.innerHTML = `<span>触って、聞いて、わかる</span><strong>光・音・宇宙・熱・画像の${labs.length}つの体験。</strong><span>体験一覧を開く →</span>`;
   app.querySelector('#explorer-section').before(invitation);
 }
 
@@ -525,11 +534,19 @@ function renderMindMap(id) {
   inspector.append(meta, relationTitle, relationList);
   layout.append(canvasWrap, inspector);
   page.append(toolbar);
-  if (['wave-equation', 'wave', 'guitar', 'music'].includes(id)) {
-    const experiment = document.createElement('a');
+  const relatedLabs = labs.filter(lab => lab.nodes.includes(id));
+  if (relatedLabs.length) {
+    const experiment = document.createElement('div');
     experiment.className = 'lab-invitation is-map';
-    experiment.href = '#lab=string';
-    experiment.innerHTML = '<strong>このつながりを、音で試そう。</strong><span>弦を短くすると、音はどう変わる？ →</span>';
+    const title = document.createElement('strong');
+    title.textContent = 'この知識を、触って試そう。';
+    experiment.append(title);
+    relatedLabs.forEach(lab => {
+      const link = document.createElement('a');
+      link.href = `#lab=${lab.id}`;
+      link.textContent = `${lab.title} ↗`;
+      experiment.append(link);
+    });
     page.append(experiment);
     page.classList.add('has-experiment');
   }
@@ -607,11 +624,21 @@ function updateSearch() {
 
 function renderRoute() {
   if (disposeLab) { disposeLab(); disposeLab = null; }
-  if (new URLSearchParams(location.hash.slice(1)).get('lab') === 'string') {
-    const lab = createStringLab();
+  const route = new URLSearchParams(location.hash.slice(1));
+  if (route.has('labs')) {
+    app.replaceChildren(createLabGallery());
+    document.title = '触ってわかる体験一覧｜どうして勉強しないといけないの？';
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    app.focus({ preventScroll: true });
+    return;
+  }
+  if (route.has('lab')) {
+    const definition = labs.find(lab => lab.id === route.get('lab'));
+    if (!definition) return renderNotFound();
+    const lab = definition.id === 'string' ? createStringLab() : createScienceLab(definition.id, nodesById);
     disposeLab = lab.dispose;
     app.replaceChildren(lab.element);
-    document.title = '弦を弾いて、波を知る｜どうして勉強しないといけないの？';
+    document.title = `${definition.title}｜どうして勉強しないといけないの？`;
     window.scrollTo({ top: 0, behavior: 'instant' });
     app.focus({ preventScroll: true });
     return;

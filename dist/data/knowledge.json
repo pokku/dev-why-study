@@ -87,7 +87,14 @@
     {"id":"sun","name":"太陽の光","summary":"太陽の中心で生まれたエネルギーが長い過程を経て表面から放射され、地球の明るさや暖かさを支える。","kind":"interest","curriculum":"日光・暮らし・宇宙","field":"宇宙"},
     {"id":"airplane","name":"飛行機","summary":"翼のまわりの空気の流れや力を調べ、機体の形や飛び方を設計する。流体力学と力学がつながる身近な乗り物。","kind":"interest","curriculum":"旅行・乗り物","field":"乗り物"},
     {"id":"guitar","name":"ギターの弦","summary":"弦を弾くと振動が生まれる。同じ張り・太さの理想的な弦なら、振動する長さを半分にすると振動数が2倍になり、1オクターブ高くなる。","kind":"interest","curriculum":"楽器・音楽","field":"音楽"},
-    {"id":"inverse-proportion","name":"反比例","summary":"一方が2倍になると他方が半分になるなど、2つの量の積が一定になる関係。同じ条件の弦では、長さと基本振動数が反比例する。","kind":"school","curriculum":"小学校6年〜中学校1年","field":"算数・数学"}
+    {"id":"inverse-proportion","name":"反比例","summary":"一方が2倍になると他方が半分になるなど、2つの量の積が一定になる関係。同じ条件の弦では、長さと基本振動数が反比例する。","kind":"school","curriculum":"小学校6年〜中学校1年","field":"算数・数学"},
+    {"id":"dispersion","name":"光の分散","summary":"光の色によって物質の屈折率が異なり、進む方向が分かれる現象。プリズムや虹の色の並びにつながる。","kind":"school","curriculum":"高校物理","field":"物理"},
+    {"id":"beats","name":"うなり","summary":"近い周波数の2つの音を重ねると、強め合う状態と弱め合う状態が繰り返される。調律でも利用する。","kind":"school","curriculum":"高校物理","field":"物理・音楽"},
+    {"id":"gravity","name":"重力と軌道","summary":"万有引力で引かれる小天体の動きは、初めの位置と速度で変わる。円・楕円の軌道や脱出を運動方程式で考える。","kind":"school","curriculum":"高校物理","field":"物理・宇宙"},
+    {"id":"resonance","name":"共振","summary":"外から加える力のリズムが固有の振動に近いと、振幅が大きくなりやすい。摩擦などの減衰も振れ幅に影響する。","kind":"school","curriculum":"高校物理","field":"物理"},
+    {"id":"interference","name":"波の干渉","summary":"複数の波が重なって、強め合ったり弱め合ったりする現象。同じ振幅の波が逆位相なら、重なる場所で打ち消し合う。","kind":"school","curriculum":"高校物理","field":"物理"},
+    {"id":"heat-equation","name":"熱方程式","summary":"温度分布が時間とともにどう変わるかを表す。温度の差が小さくなる方向へ熱が拡散する。","kind":"academic","curriculum":"大学・微分方程式","field":"物理・数学"},
+    {"id":"image-frequency","name":"画像の空間周波数","summary":"画像を、ゆっくり変わる明暗や細かく繰り返す模様に分ける考え方。変換・圧縮・フィルターに使う。","kind":"academic","curriculum":"大学・画像処理","field":"情報・数学"}
   ],
   "edges": [
     { "from": "multiplication", "to": "division", "type": "related", "reason": "掛け算と割り算は互いに逆の計算として量の関係を扱う。" },
@@ -246,7 +253,27 @@
     {"from":"wave","to":"guitar","type":"example","reason":"弦の上を進む波が端で反射し、定常波として振動する。"},
     {"from":"inverse-proportion","to":"guitar","type":"usedIn","reason":"張力と線密度が一定なら、弦の基本振動数は振動する長さに反比例する。"},
     {"from":"function","to":"inverse-proportion","type":"example","reason":"反比例はy=a/xで表せる関数の例で、比例とは異なる変化をする。"},
-    {"from":"trigonometry","to":"guitar","type":"toolFor","reason":"弦の基本振動や倍音を、位置と時間に対するsin・cosで表せる。"}
+    {"from":"trigonometry","to":"guitar","type":"toolFor","reason":"弦の基本振動や倍音を、位置と時間に対するsin・cosで表せる。"},
+    {"from":"wave","to":"dispersion","type":"related","reason":"光は波で、波長によって屈折率が変わる性質が色の分離につながる。"},
+    {"from":"trigonometry","to":"dispersion","type":"toolFor","reason":"入射角と屈折角のsinを使うスネルの法則で光の進路を求める。"},
+    {"from":"wave","to":"beats","type":"example","reason":"2つの波の重なりから、ゆっくりした音の強弱が生じる。"},
+    {"from":"trigonometry","to":"beats","type":"toolFor","reason":"2つのsinの和を変形すると、周波数差と包絡線の関係を読める。"},
+    {"from":"beats","to":"music","type":"usedIn","reason":"楽器の音の高さを合わせるとき、うなりが少なくなることを手がかりにできる。"},
+    {"from":"motion","to":"gravity","type":"toolFor","reason":"重力による加速度から、位置と速度の変化を追う。"},
+    {"from":"vector","to":"gravity","type":"toolFor","reason":"位置・速度・加速度の向きを、ベクトルで扱う。"},
+    {"from":"gravity","to":"space","type":"example","reason":"人工衛星や惑星の軌道は重力によって曲げられる運動として考えられる。"},
+    {"from":"motion","to":"resonance","type":"toolFor","reason":"復元力・減衰・周期的な外力を入れた運動方程式で振幅の変化を調べる。"},
+    {"from":"trigonometry","to":"resonance","type":"toolFor","reason":"sinやcosで周期的な力や振動のリズムを表す。"},
+    {"from":"wave","to":"resonance","type":"related","reason":"弦や管の固有振動と共振は、楽器の音を理解する手がかりになる。"},
+    {"from":"wave","to":"interference","type":"example","reason":"複数の波の変位を足し合わせると、強め合いと弱め合いを表せる。"},
+    {"from":"trigonometry","to":"interference","type":"toolFor","reason":"三角関数の位相差から、重なった波の振幅を計算する。"},
+    {"from":"interference","to":"signal-processing","type":"application","reason":"ノイズキャンセリングでは耳の位置で騒音を弱める信号を作る。"},
+    {"from":"calculus","to":"heat-equation","type":"prerequisite","reason":"時間変化と空間的な温度差を微分で関係づける。"},
+    {"from":"differential-equation","to":"heat-equation","type":"example","reason":"熱方程式は時間と空間に関する偏微分方程式の代表例。"},
+    {"from":"heat-equation","to":"cooking","type":"application","reason":"調理器具の中で熱が伝わる様子を考える基礎になる。実際の調理には対流や蒸発なども関わる。"},
+    {"from":"fourier","to":"image-frequency","type":"toolFor","reason":"周波数成分へ分ける考え方を画像の明暗の模様にも使う。"},
+    {"from":"trigonometry","to":"image-frequency","type":"toolFor","reason":"コサインなどの模様を組み合わせて画像を表現する。"},
+    {"from":"image-frequency","to":"compression","type":"usedIn","reason":"JPEGでは小さな領域のDCT成分を量子化するなどして情報量を減らす。"}
   ],
   "featuredPaths": [
     {

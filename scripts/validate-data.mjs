@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { formulas, scenes } from '../dist/discoveries.js';
+import { labs } from '../dist/lab-catalog.js';
 
 const source = new URL('../dist/data/knowledge.json', import.meta.url);
 const data = JSON.parse(await readFile(source, 'utf8'));
@@ -27,6 +28,15 @@ for (const edge of data.edges ?? []) {
 }
 
 const connected = new Set(data.edges.flatMap((edge) => [edge.from, edge.to]));
+const labIds = new Set();
+for (const lab of labs) {
+  if (labIds.has(lab.id)) problems.push(`体験IDの重複: ${lab.id}`);
+  labIds.add(lab.id);
+  for (const node of lab.nodes) if (!ids.has(node)) problems.push(`体験のリンク切れ: ${lab.id} -> ${node}`);
+  for (const [key,,min,max,step,value] of lab.controls ?? []) {
+    if (!(step > 0 && min <= value && value <= max)) problems.push(`体験の設定範囲が不正: ${lab.id}/${key}`);
+  }
+}
 const labSource = await readFile(new URL('../dist/string-lab.js', import.meta.url), 'utf8');
 for (const [, id] of labSource.matchAll(/href="#node=([a-z0-9-]+)"/g)) {
   if (!ids.has(id)) problems.push(`弦の体験からのリンク先が存在しない: ${id}`);
@@ -111,3 +121,4 @@ if (problems.length) {
 
 console.log(`OK: ${ids.size} nodes, ${data.edges.length} edges, ${data.featuredPaths.length} featured paths`);
 console.log(`OK: ${formulas.length} formulas, ${scenes.length} science illustrations, discovery paths connected`);
+console.log(`OK: ${labIds.size} interactive experiences, links and controls checked`);

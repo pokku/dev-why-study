@@ -5,7 +5,7 @@ export function createStringLab() {
   const element = document.createElement('article');
   element.className = 'string-lab';
   element.innerHTML = `
-    <a class="lab-back" href="#node=wave-equation">← 波動方程式のマップへ</a>
+    <a class="lab-back" href="#labs">← 体験一覧へ</a> · <a class="lab-back" href="#node=wave-equation">波動方程式のマップへ</a>
     <header class="lab-heading"><p class="micro-label">TOUCH THE EQUATION · 01</p>
       <h1>この式から、音楽が聞こえる。</h1>
       <p>弦を短くしたら、音はどう変わる？<br>長さを変えて、弾き比べてみよう。</p></header>
