@@ -2,6 +2,7 @@ import { formulas, scenes, formulaMarkup } from './discoveries.js';
 import { createStringLab } from './string-lab.js';
 import { labs } from './lab-catalog.js';
 import { createLabGallery, createScienceLab } from './science-labs.js';
+import { createRadioLab } from './radio-labs.js';
 
 const app = document.querySelector('#app');
 const homeTemplate = document.querySelector('#home-template');
@@ -345,7 +346,7 @@ function renderHome() {
   const invitation = document.createElement('a');
   invitation.className = 'lab-invitation';
   invitation.href = '#labs';
-  invitation.innerHTML = `<span>触って、聞いて、わかる</span><strong>光・音・宇宙・熱・画像の${labs.length}つの体験。</strong><span>体験一覧を開く →</span>`;
+  invitation.innerHTML = `<span>触って、聞いて、わかる</span><strong>電波・光・音・宇宙・暮らしの${labs.length}の体験。</strong><span>体験一覧を開く →</span>`;
   app.querySelector('#explorer-section').before(invitation);
 }
 
@@ -635,7 +636,7 @@ function renderRoute() {
   if (route.has('lab')) {
     const definition = labs.find(lab => lab.id === route.get('lab'));
     if (!definition) return renderNotFound();
-    const lab = definition.id === 'string' ? createStringLab() : createScienceLab(definition.id, nodesById);
+    const lab = definition.id === 'string' ? createStringLab() : definition.renderer === 'radio' ? createRadioLab(definition.id, nodesById) : createScienceLab(definition.id, nodesById);
     disposeLab = lab.dispose;
     app.replaceChildren(lab.element);
     document.title = `${definition.title}｜どうして勉強しないといけないの？`;

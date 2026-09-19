@@ -94,7 +94,13 @@
     {"id":"resonance","name":"共振","summary":"外から加える力のリズムが固有の振動に近いと、振幅が大きくなりやすい。摩擦などの減衰も振れ幅に影響する。","kind":"school","curriculum":"高校物理","field":"物理"},
     {"id":"interference","name":"波の干渉","summary":"複数の波が重なって、強め合ったり弱め合ったりする現象。同じ振幅の波が逆位相なら、重なる場所で打ち消し合う。","kind":"school","curriculum":"高校物理","field":"物理"},
     {"id":"heat-equation","name":"熱方程式","summary":"温度分布が時間とともにどう変わるかを表す。温度の差が小さくなる方向へ熱が拡散する。","kind":"academic","curriculum":"大学・微分方程式","field":"物理・数学"},
-    {"id":"image-frequency","name":"画像の空間周波数","summary":"画像を、ゆっくり変わる明暗や細かく繰り返す模様に分ける考え方。変換・圧縮・フィルターに使う。","kind":"academic","curriculum":"大学・画像処理","field":"情報・数学"}
+    {"id":"image-frequency","name":"画像の空間周波数","summary":"画像を、ゆっくり変わる明暗や細かく繰り返す模様に分ける考え方。変換・圧縮・フィルターに使う。","kind":"academic","curriculum":"大学・画像処理","field":"情報・数学"},
+    {"id":"amplitude-modulation","name":"AM・振幅変調","summary":"音の信号に合わせて搬送波の振幅を変える通信方式。ラジオ放送で利用される。","kind":"technology","level":"applied","curriculum":"身近な通信と光","field":"通信技術"},
+    {"id":"frequency-modulation","name":"FM・周波数変調","summary":"音の信号に合わせて搬送波の瞬間周波数を変える通信方式。ラジオ放送で利用される。","kind":"technology","level":"applied","curriculum":"身近な通信と光","field":"通信技術"},
+    {"id":"demodulation","name":"復調","summary":"受信した変調波から、元の音や情報を取り出す処理。","kind":"technology","level":"applied","curriculum":"身近な通信と光","field":"通信技術"},
+    {"id":"electromagnetic-spectrum","name":"電磁波スペクトル","summary":"電波、赤外線、可視光、紫外線、X線などを周波数や波長で並べたもの。境界には慣用的な幅がある。","kind":"technology","level":"applied","curriculum":"身近な通信と光","field":"通信技術"},
+    {"id":"polarization","name":"偏光・偏波","summary":"電磁波の電場がどの向きに振動するかを表す性質。アンテナの受信や偏光板に関わる。","kind":"technology","level":"applied","curriculum":"身近な通信と光","field":"通信技術"},
+    {"id":"radio-receiver","name":"ラジオ","summary":"電波にのせられた音の情報を選び、取り出して聞く受信機。","kind":"technology","level":"applied","curriculum":"身近な通信と光","field":"通信技術"}
   ],
   "edges": [
     { "from": "multiplication", "to": "division", "type": "related", "reason": "掛け算と割り算は互いに逆の計算として量の関係を扱う。" },
@@ -273,7 +279,25 @@
     {"from":"heat-equation","to":"cooking","type":"application","reason":"調理器具の中で熱が伝わる様子を考える基礎になる。実際の調理には対流や蒸発なども関わる。"},
     {"from":"fourier","to":"image-frequency","type":"toolFor","reason":"周波数成分へ分ける考え方を画像の明暗の模様にも使う。"},
     {"from":"trigonometry","to":"image-frequency","type":"toolFor","reason":"コサインなどの模様を組み合わせて画像を表現する。"},
-    {"from":"image-frequency","to":"compression","type":"usedIn","reason":"JPEGでは小さな領域のDCT成分を量子化するなどして情報量を減らす。"}
+    {"from":"image-frequency","to":"compression","type":"usedIn","reason":"JPEGでは小さな領域のDCT成分を量子化するなどして情報量を減らす。"},
+    {"from":"trigonometry","to":"amplitude-modulation","type":"toolFor","reason":"音と搬送波を三角関数で表し、掛け合わせて振幅を変える。"},
+    {"from":"trigonometry","to":"frequency-modulation","type":"toolFor","reason":"位相が時間とともに変わる正弦波としてFMを表せる。"},
+    {"from":"calculus","to":"frequency-modulation","type":"toolFor","reason":"位相の時間微分が瞬間角周波数になる。"},
+    {"from":"signal-processing","to":"demodulation","type":"application","reason":"包絡線や位相の変化を調べ、元の信号を取り出す。"},
+    {"from":"amplitude-modulation","to":"demodulation","type":"related","reason":"AM信号は包絡線などから元の音を取り出せる。"},
+    {"from":"frequency-modulation","to":"demodulation","type":"related","reason":"FM信号は瞬間周波数の変化から元の音を取り出せる。"},
+    {"from":"demodulation","to":"radio-receiver","type":"usedIn","reason":"ラジオは選局した電波を復調して音に戻す。"},
+    {"from":"radio-receiver","to":"music","type":"usedIn","reason":"放送された音楽を受信して聞ける。"},
+    {"from":"communication-engineering","to":"amplitude-modulation","type":"example","reason":"振幅変調は情報を搬送波にのせる基本的な方法。"},
+    {"from":"communication-engineering","to":"frequency-modulation","type":"example","reason":"周波数変調は搬送波の瞬間周波数に情報をのせる。"},
+    {"from":"wave","to":"electromagnetic-spectrum","type":"develops","reason":"周波数と波長によって電磁波を整理する。"},
+    {"from":"inverse-proportion","to":"electromagnetic-spectrum","type":"toolFor","reason":"真空中では光速が一定なので、周波数と波長は反比例する。"},
+    {"from":"maxwell-equations","to":"electromagnetic-spectrum","type":"related","reason":"可視光も電波も電磁波として同じ方程式で記述できる。"},
+    {"from":"electromagnetic-spectrum","to":"wifi","type":"example","reason":"Wi-Fiは電磁波のうちマイクロ波帯を利用する。"},
+    {"from":"vector","to":"polarization","type":"toolFor","reason":"電場の振動方向とアンテナ方向への成分をベクトルで表す。"},
+    {"from":"trigonometry","to":"polarization","type":"toolFor","reason":"直線偏光同士の理想的な受信電力比は角度の余弦の二乗になる。"},
+    {"from":"maxwell-equations","to":"polarization","type":"related","reason":"平面電磁波の電場と磁場は進行方向に垂直に振動する。"},
+    {"from":"polarization","to":"communication-engineering","type":"usedIn","reason":"送受信の偏波を合わせることが受信電力に関係する。"}
   ],
   "featuredPaths": [
     {

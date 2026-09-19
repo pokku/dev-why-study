@@ -34,9 +34,23 @@
 
 ## 実機で確認すること
 
-- 全8体験のカードと各知識マップとの往復、戻る操作。
+- 全12体験のカードと各知識マップとの往復、戻る操作。
 - うなり・干渉の音量0、再生・停止、再生中に設定を変える／別画面に移る操作。
 - 軌道の円・低速衝突・高速投射、ブランコの同周期／ずれた周期、熱のタップ／中央加熱。
 - 画像の端末内読み込み・サンプル復帰・周波数1と32の比較。スマホ幅でのスライダー・図・説明文。
 
 buildは既存の知識グラフに加えて、公式・科学図の参照先、日常への経路の連結、学校の知識との直接の関係を検査する。ブラウザ表示はオーナーがdev Pagesで確認する。特にスマートフォンでの長い式、図、入口からマップへの遷移、戻る操作を確認する。
+# 電波シリーズ（2026-09-19追加）
+
+- AMと包絡線検波: [Analog Devices, Envelope Detector](https://wiki.analog.com/university/courses/alm1k/circuits1/alm-cir-envelope-detector)
+- FM: [Analog Devices, FM Modulator](https://www.analog.com/en/resources/glossary/fm-modulator.html)、[FM detectors](https://www.analog.com/en/resources/analog-dialogue/studentzone/studentzone-november-2024.html)
+- 電磁波・スペクトル: [NASA, Electromagnetic Spectrum](https://imagine.gsfc.nasa.gov/science/toolbox/emspectrum2.html)、[NASA, Basics of Space Flight](https://science.nasa.gov/learn/basics-of-space-flight/chapter6-2/)
+- 偏光: [MIT OCW, Lecture 17: Polarization](https://ocw.mit.edu/courses/8-03sc-physics-iii-vibrations-and-waves-fall-2016/pages/part-iii-optics/lecture-17/)
+
+説明は独自に作成。外部画像や文章を転載せずCanvasで描画する。
+
+`radio` は単音を複素ベースバンドで変調し、AMは絶対値、FMは隣接サンプルの位相差から復調する。音・図のサンプルレート96kHz、図は5msを描画、図に使う搬送波8kHz、FM周波数偏移2000μ Hz、AM変調度μ=0.1〜0.95。無雑音時の復調一致を操作範囲の端と代表値で検証。正の共通利得変動と独立I/Q加算雑音を分ける。「FMはいつでも雑音に強い」と一般化しない。図は復調直後、音は2500Hzを係数計算に使う前後方向の1次低域フィルターと±2の振幅制限、10msのフェードを適用。前後方向処理は比較用のオフライン処理で実受信機そのものではない。搬送波は再生せず、元の音か復調した音のみ3秒再生。
+
+`em-wave` は真空中の同位相の直線偏光を斜め投影。EとBの図の振幅はそれぞれ正規化し、実単位で同じ大きさという意味ではない。`spectrum` はc=299792458m/s、λ=c/f。対数スライダーの帯域境界は概略、マイクロ波は電波の一部。下の波は常に1周期で実寸ではない。`polarization` は進行方向に垂直な面で受信アンテナを回し、電場成分のcosθから電力比cos²θを計算。指向性・反射・障害物による損失を同時に表すものではない。
+
+実機確認: AM/FMの切り替えと波形、雑音0の聞き比べ、振幅雑音と加算雑音の違い、音量0と停止、設定変更・戻る・画面非表示で音が止まること。電磁波の開始/停止/1コマ、動きを減らす設定、スペクトルの各プリセット、偏波0°/45°/90°/180°、スマートフォン幅の図と操作・知識マップへの遷移を確認する。

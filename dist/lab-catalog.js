@@ -1,4 +1,6 @@
+import { radioLabs } from './radio-catalog.js';
 export const labs = [
+  ...radioLabs,
   { id: 'string', title: '弦を弾く', icon: '∿', category: '音と波', question: '長さを半分にすると、何が聞こえる？', nodes: ['wave-equation', 'guitar', 'wave', 'music'] },
   { id: 'prism', title: '光を虹色に分ける', icon: '△', category: '光', question: '白い光の中に、色が隠れている？', nodes: ['dispersion', 'wave', 'trigonometry'], controls: [['incidence', '光を入れる角度', 45, 65, 1, 50, '°'], ['dispersion', '色による屈折率の差', 0, 1.5, .05, 1, '倍']], formula: 'n₁ sin θ₁ = n₂ sin θ₂', everyday: 'プリズムで色が分かれるのは、光の色によって曲がり方が違うから。雨上がりの虹でも、水滴での屈折・反射と色ごとの差が関わります。', lesson: '屈折率の差を0にすると色が重なり、白い光になります。差を増やすと紫と赤の進む方向が離れます。', limit: '空気中の頂角60°のプリズムをスネルの法則で追跡。ガラスは説明用の屈折率モデル、色は代表的な7色です。雨粒の虹そのもののシミュレーションではありません。' },
   { id: 'beats', title: '音がうねる', icon: '≋', category: '音と波', question: '2つの音を近づけると、うわんうわん。', nodes: ['beats', 'wave', 'trigonometry', 'music'], controls: [['difference', '2つの音の周波数差', 0, 12, .25, 2, 'Hz']], formula: 'うなりの回数 / 秒 = |f₁ − f₂|', everyday: 'ギターやピアノの調律では、音のうなりを手がかりに高さを合わせられます。', lesson: '220Hzと222Hzなら1秒間に2回うなります。差を0にすると、音の強さのゆっくりした変化が消えます。', limit: '同じ大きさの純音を同じ出力先で重ねます。音の波形は短い時間窓、包絡線は1秒の範囲を表示。音量0でもグラフで試せます。', audio: true },

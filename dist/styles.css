@@ -472,6 +472,15 @@ footer p { margin: 0; display: flex; justify-content: space-between; gap: 20px; 
   .lab-gallery-card p { min-height: 0; }
   .science-reading { padding-inline: 17px; }
 }
+.radio-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 22px; }
+.radio-switch:empty { display: none; }
+.radio-switch button { border: 1px solid #bed2e3; border-radius: 10px; background: #f4f8fc; padding: 13px 8px; color: #315570; cursor: pointer; font-size: .8rem; }
+.radio-switch button[aria-pressed=true] { background: #195f97; color: white; border-color: #195f97; }
+.radio-lab select { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #bed2e3; border-radius: 8px; background: white; color: #173851; font: inherit; }
+.radio-lab select:focus-visible { outline: 3px solid #2962ff; outline-offset: 3px; }
+.lab-color-radio .lab-gallery-art,.lab-color-polarization .lab-gallery-art { font-size: 2.7rem; color: #ffcd83; }
+.lab-color-em-wave .lab-gallery-art { font-size: 3.8rem; color: #7cc7ff; }
+.lab-color-spectrum .lab-gallery-art { background: linear-gradient(125deg,#20456a,#473270,#723b59); font-size: 3.8rem; color: #e1f7e9; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
