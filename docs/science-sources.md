@@ -42,6 +42,13 @@
 buildは既存の知識グラフに加えて、公式・科学図の参照先、日常への経路の連結、学校の知識との直接の関係を検査する。ブラウザ表示はオーナーがdev Pagesで確認する。特にスマートフォンでの長い式、図、入口からマップへの遷移、戻る操作を確認する。
 # 電波シリーズ（2026-09-19追加）
 
+## 音の分解・ドップラー効果（同日追加）
+
+- [Basic Acoustics, Fundamentals of Sound](https://www.acousticslab.org/RECA220/PMFiles/Module02a.htm): 周期信号の倍音とフーリエ合成。体験では6本の正弦波を合成し、1周期512点の波形から正弦・余弦への射影で振幅を再計算する。正弦波、奇数倍音1/nの矩形波近似、全倍音1/nののこぎり波近似を用意。6成分のみなので理想的な角や不連続は再現しない。録音解析ではない。全成分0なら無音。
+- [OpenStax, University Physics 17.7 The Doppler Effect](https://openstax.org/books/university-physics-volume-1/pages/17-7-the-doppler-effect): 静止した媒質・聞き手、同一直線上を動く音源のモデル。音速343m/s、接近速度vを正としてf聞こえる=f₀c/(c−v)。速度は−170〜170m/s。音源通過前または表示範囲端で停止。波面は放出位置を中心に音速で拡大し、5Hzに間引いた模式図。試聴は現在の速度での定常音で距離減衰や通過音は再現しない。
+
+数式はMathMLで総和・下付き・分数を表示。図の読み取り結果は文章でも表示。実機ではプリセット、倍音0と全消去、選択成分だけの試聴、速度0/正/負の式と聞き比べ、停止・設定変更・画面非表示・戻る時の停止、スマホの数式と図を確認する。計算はNodeのテスト4件で確認済み、実機の発音と表示は未確認。
+
 - AMと包絡線検波: [Analog Devices, Envelope Detector](https://wiki.analog.com/university/courses/alm1k/circuits1/alm-cir-envelope-detector)
 - FM: [Analog Devices, FM Modulator](https://www.analog.com/en/resources/glossary/fm-modulator.html)、[FM detectors](https://www.analog.com/en/resources/analog-dialogue/studentzone/studentzone-november-2024.html)
 - 電磁波・スペクトル: [NASA, Electromagnetic Spectrum](https://imagine.gsfc.nasa.gov/science/toolbox/emspectrum2.html)、[NASA, Basics of Space Flight](https://science.nasa.gov/learn/basics-of-space-flight/chapter6-2/)

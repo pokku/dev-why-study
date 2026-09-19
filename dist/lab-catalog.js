@@ -1,5 +1,7 @@
 import { radioLabs } from './radio-catalog.js';
+import { soundLabs } from './sound-catalog.js';
 export const labs = [
+  ...soundLabs,
   ...radioLabs,
   { id: 'string', title: '弦を弾く', icon: '∿', category: '音と波', question: '長さを半分にすると、何が聞こえる？', nodes: ['wave-equation', 'guitar', 'wave', 'music'] },
   { id: 'prism', title: '光を虹色に分ける', icon: '△', category: '光', question: '白い光の中に、色が隠れている？', nodes: ['dispersion', 'wave', 'trigonometry'], controls: [['incidence', '光を入れる角度', 45, 65, 1, 50, '°'], ['dispersion', '色による屈折率の差', 0, 1.5, .05, 1, '倍']], formula: 'n₁ sin θ₁ = n₂ sin θ₂', everyday: 'プリズムで色が分かれるのは、光の色によって曲がり方が違うから。雨上がりの虹でも、水滴での屈折・反射と色ごとの差が関わります。', lesson: '屈折率の差を0にすると色が重なり、白い光になります。差を増やすと紫と赤の進む方向が離れます。', limit: '空気中の頂角60°のプリズムをスネルの法則で追跡。ガラスは説明用の屈折率モデル、色は代表的な7色です。雨粒の虹そのもののシミュレーションではありません。' },

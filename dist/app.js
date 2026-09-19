@@ -3,6 +3,7 @@ import { createStringLab } from './string-lab.js';
 import { labs } from './lab-catalog.js';
 import { createLabGallery, createScienceLab } from './science-labs.js';
 import { createRadioLab } from './radio-labs.js';
+import { createSoundLab } from './sound-labs.js';
 
 const app = document.querySelector('#app');
 const homeTemplate = document.querySelector('#home-template');
@@ -116,6 +117,8 @@ const academicClusters = {
 };
 
 const schoolRoutes = {
+  'sound-harmonics': [['高校', '高校・物理']],
+  'doppler-effect': [['高校', '高校・物理']],
   dispersion: [['高校', '高校・物理']],
   beats: [['高校', '高校・物理']],
   gravity: [['高校', '高校・物理']],
@@ -636,7 +639,7 @@ function renderRoute() {
   if (route.has('lab')) {
     const definition = labs.find(lab => lab.id === route.get('lab'));
     if (!definition) return renderNotFound();
-    const lab = definition.id === 'string' ? createStringLab() : definition.renderer === 'radio' ? createRadioLab(definition.id, nodesById) : createScienceLab(definition.id, nodesById);
+    const lab = definition.id === 'string' ? createStringLab() : definition.renderer === 'sound' ? createSoundLab(definition.id, nodesById) : definition.renderer === 'radio' ? createRadioLab(definition.id, nodesById) : createScienceLab(definition.id, nodesById);
     disposeLab = lab.dispose;
     app.replaceChildren(lab.element);
     document.title = `${definition.title}｜どうして勉強しないといけないの？`;
