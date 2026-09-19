@@ -6,12 +6,13 @@ export const polarizationPower = degrees => Math.cos(degrees * Math.PI / 180) **
 // Ideal complex-baseband transmitter and envelope / phase-difference receivers.
 export function radioSignal({ mode = 'am', frequency = 220, depth = .7, noise = 0, noiseType = 'amplitude', duration = .025, sampleRate = 96000, seed = 42 } = {}) {
   const length = Math.ceil(duration * sampleRate);
-  const original = new Float32Array(length), received = new Float32Array(length), recovered = new Float32Array(length);
+  const original = new Float32Array(length), carrier = new Float32Array(length), received = new Float32Array(length), recovered = new Float32Array(length);
   let phase = 0, prevI = 1, prevQ = 0;
   function random() { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296 * 2 - 1; }
   for (let n = 0; n < length; n++) {
     const t = n / sampleRate, m = Math.sin(TAU * frequency * t);
     original[n] = m;
+    carrier[n] = Math.cos(TAU * 8000 * t);
     phase += TAU * 2000 * depth * m / sampleRate;
     let i = mode === 'am' ? 1 + depth * m : Math.cos(phase);
     let q = mode === 'am' ? 0 : Math.sin(phase);
@@ -23,7 +24,7 @@ export function radioSignal({ mode = 'am', frequency = 220, depth = .7, noise = 
     recovered[n] = mode === 'am' ? (Math.hypot(i, q) - 1) / depth : Math.atan2(q * prevI - i * prevQ, i * prevI + q * prevQ) * sampleRate / (TAU * 2000 * depth);
     prevI = i; prevQ = q;
   }
-  return { original, received, recovered };
+  return { original, carrier, received, recovered };
 }
 
 export function audioSamples(samples, sampleRate = 96000) {

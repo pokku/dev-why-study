@@ -12,16 +12,32 @@ function quantity(value, units) {
 const hz = f => quantity(f, [[1e18,'EHz'],[1e15,'PHz'],[1e12,'THz'],[1e9,'GHz'],[1e6,'MHz'],[1e3,'kHz'],[1,'Hz']]);
 const meters = l => quantity(l, [[1e3,'km'],[1,'m'],[1e-2,'cm'],[1e-3,'mm'],[1e-6,'μm'],[1e-9,'nm'],[1e-12,'pm'],[1e-15,'fm']]);
 
+function radioFormulas() {
+  const mt = '<mi>m</mi><mo>(</mo><mi>t</mi><mo>)</mo>';
+  const fc = '<msub><mi>f</mi><mi>c</mi></msub>';
+  const ct = '<mi>c</mi><mo>(</mo><mi>t</mi><mo>)</mo>';
+  const phase = '<mi>φ</mi><mo>(</mo><mi>t</mi><mo>)</mo>';
+  const st = mode => `<msub><mi>s</mi><mtext>${mode}</mtext></msub><mo>(</mo><mi>t</mi><mo>)</mo>`;
+  const math = (label, body) => `<div class="radio-math-scroll"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="${label}"><mrow>${body}</mrow></math></div>`;
+  return `<div class="radio-formulas">
+    <section><h3>まず、送りたい音を波で表す</h3>${math('音の信号 m(t) = sin(2πft)', `${mt}<mo>=</mo><mi mathvariant="normal">sin</mi><mo>(</mo><mn>2</mn><mi>π</mi><mi>f</mi><mi>t</mi><mo>)</mo>`)}<p><b>m(t)</b> は音の波。<b>f</b> は音の高さを決める周波数、<b>t</b> は時間です。</p></section>
+    <section><h3>音を運ぶための波：搬送波</h3>${math('搬送波 c(t) = cos(2πfc t)', `${ct}<mo>=</mo><mi mathvariant="normal">cos</mi><mo>(</mo><mn>2</mn><mi>π</mi>${fc}<mi>t</mi><mo>)</mo>`)}<p><b>c(t)</b> は、まだ音を載せていない一定の波。<b>f<sub>c</sub></b> はその周波数です。この図では8kHzにしています。</p></section>
+    <section><h3>AM：信号波で、搬送波の高さを変える</h3>${math('AMの変調波 sAM(t) = [1 + μ m(t)] c(t)', `${st('AM')}<mo>=</mo><mo>[</mo><mn>1</mn><mo>+</mo><mi>μ</mi>${mt}<mo>]</mo><mo>⁢</mo>${ct}`)}<p>搬送波 <b>c(t)</b> に、音に合わせて変わる高さ <b>1 + μm(t)</b> を掛けます。<b>μ</b>（ミュー）が変調の深さ。2つの波をそのまま足す仕組みではありません。</p></section>
+    <section><h3>FM：信号波で、搬送波の間隔を変える</h3>${math('瞬間周波数 f瞬間(t) = fc + Δf m(t)', `<msub><mi>f</mi><mtext>瞬間</mtext></msub><mo>(</mo><mi>t</mi><mo>)</mo><mo>=</mo>${fc}<mo>+</mo><mi>Δf</mi>${mt}`)}<p><b>Δf</b>（デルタ・エフ）は周波数を変える幅。高さは一定のまま、音に合わせて周波数を変えます。周波数が高い部分ほど、波の間隔が狭くなります。</p>
+    <details class="radio-model-details"><summary>FMの変調波も数式で見る</summary>${math('FMの変調波 sFM(t) = cos φ(t)', `${st('FM')}<mo>=</mo><mi mathvariant="normal">cos</mi><mo>(</mo>${phase}<mo>)</mo>`)}${math('位相 φ(t) = 2πfc t + 2πΔf ∫0からt m(τ) dτ', `${phase}<mo>=</mo><mn>2</mn><mi>π</mi>${fc}<mi>t</mi><mo>+</mo><mn>2</mn><mi>π</mi><mi>Δf</mi><msubsup><mo>∫</mo><mn>0</mn><mi>t</mi></msubsup><mi>m</mi><mo>(</mo><mi>τ</mi><mo>)</mo><mspace width="0.2em"/><mi mathvariant="normal">d</mi><mi>τ</mi>`)}<p><b>φ(t)</b>（ファイ）は波の進み具合「位相」。周波数の変化を積分して位相に反映します。積分の中の <b>τ</b>（タウ）も時間を表します。式は雑音のない連続時間のモデルで、図は時間を細かく区切って計算しています。</p></details></section>
+  </div>`;
+}
+
 export function createRadioLab(id, nodesById) {
   const lab = radioLabs.find(item => item.id === id);
   const element = document.createElement('article');
   element.className = 'string-lab science-lab radio-lab';
   element.innerHTML = `<a class="lab-back" href="#labs">← 体験一覧へ</a>
     <header class="lab-heading"><p class="micro-label">${lab.category}</p><h1>${lab.title}</h1><p>${lab.question}</p></header>
-    <div class="science-workbench"><section class="science-stage"><canvas width="1440" height="800" role="img" aria-label="${lab.title}。操作結果は図の下にも表示します。"></canvas><p class="science-reading" data-reading></p></section>
+    <div class="science-workbench"><section class="science-stage"><canvas width="1440" height="${id === 'radio' ? 1000 : 800}" role="img" aria-label="${lab.title}。操作結果は図の下にも表示します。"></canvas><p class="science-reading" data-reading></p></section>
     <section class="lab-controls" aria-label="実験の操作"><div class="radio-switch" data-switch></div><div data-controls></div><div class="science-actions" data-actions></div><p class="lab-status" data-status role="status">設定を変えて試してみよう。</p></section></div>
     <section class="lab-discovery"><span class="micro-label">気づくヒント</span><h2>${lab.lesson}</h2><p>${lab.everyday}</p></section>
-    <section class="lab-equation"><div><p class="micro-label">仕組みの裏側</p><h2>${lab.formula}</h2><p class="lab-model-note">${lab.limit}</p></div><div class="lab-school"><h2>学校の勉強へつなげる</h2><div data-links></div></div></section>`;
+    <section class="lab-equation"><div><p class="micro-label">仕組みの裏側</p>${id === 'radio' ? radioFormulas() : `<h2>${lab.formula}</h2>`}<details class="radio-model-details"><summary>この実験の条件・省略していること</summary><p>${lab.limit}</p></details></div><div class="lab-school"><h2>学校の勉強へつなげる</h2><div data-links></div></div></section>`;
   const $ = selector => element.querySelector(selector);
   const ctx = $('canvas').getContext('2d'), status = $('[data-status]'), reading = $('[data-reading]');
   if (!ctx) { status.textContent = 'このブラウザでは図を表示できません。'; return { element, dispose() {} }; }
@@ -57,10 +73,10 @@ export function createRadioLab(id, nodesById) {
       b.setAttribute('aria-pressed', String(type === mode)); return b;
     });
     const choice = document.createElement('div');
-    choice.innerHTML = '<label for="radio-noise-type">雑音の種類</label><select id="radio-noise-type"><option value="amplitude">振幅の揺れ</option><option value="additive">加算雑音</option></select>';
+    choice.innerHTML = '<label for="radio-noise-type">電波に加える乱れ</label><select id="radio-noise-type"><option value="amplitude">電波の高さが揺れる</option><option value="additive">別の電気信号が混ざる</option></select><p data-noise-help></p>';
     choice.querySelector('select').addEventListener('change', event => { noiseType = event.target.value; stopAudio(); render(); status.textContent = '雑音の種類を変更しました。'; });
     $('[data-controls]').append(choice);
-    button('① 元の音（3秒）', () => playAudio(false)); button('③ 受信した音（3秒）', () => playAudio(true));
+    button('① 元の音（3秒）', () => playAudio(false)); button('④ 取り出した音（3秒）', () => playAudio(true));
     button('■ 音を止める', () => { stopAudio(); status.textContent = '音を停止しました。'; });
     const volume = document.createElement('div');
     volume.innerHTML = '<label for="radio-volume">音量<output for="radio-volume">20%</output></label><input id="radio-volume" type="range" min="0" max="100" value="20">';
@@ -112,18 +128,20 @@ export function createRadioLab(id, nodesById) {
   function line(x1,y1,x2,y2,color,width = 2) { ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.strokeStyle=color; ctx.lineWidth=width; ctx.stroke(); }
   function path(points,color,width = 2) { ctx.beginPath(); points.forEach(([x,y],i) => i ? ctx.lineTo(x,y) : ctx.moveTo(x,y)); ctx.strokeStyle=color; ctx.lineWidth=width; ctx.stroke(); }
   function render() {
-    ctx.fillStyle = '#0c192b'; ctx.fillRect(0,0,720,400);
+    ctx.fillStyle = '#0c192b'; ctx.fillRect(0,0,720,id === 'radio' ? 500 : 400);
     if (id === 'radio') {
       const signal = radioSignal({...values,mode,noiseType,duration:.005});
       text(`${mode.toUpperCase()}  音 → 変調 → 受信 → 復調（5ms）`,26,32,'#b9d4ed',19);
-      const rows = [['① 送りたい音',signal.original,99,'#77e3c7',29],['② 雑音を通った電波',signal.received,219,'#6fbaff',22],['③ 取り出した音（フィルター前）',signal.recovered,339,'#ffca7e',29]];
-      ctx.save(); ctx.beginPath(); ctx.rect(24,45,672,350); ctx.clip();
+      const receivedLabel = values.noise === 0 ? '③ 音を載せた電波（受信側・雑音なし）' : noiseType === 'amplitude' ? '③ 音を載せた電波（受信側・高さが揺れた）' : '③ 音を載せた電波（受信側・雑音が混ざった）';
+      $('[data-noise-help]').textContent = values.noise === 0 ? '今は雑音0。送った電波が、そのまま届いた状態です。強さを上げると、途中で電波が乱れた場合を試せます。' : noiseType === 'amplitude' ? '届く電波の高さが、送りたい音とは関係なく揺れる状態を再現しています。' : '送りたい音とは無関係な電気信号が、届く電波に混ざる状態を再現しています。';
+      const rows = [['① 信号波：送りたい音',signal.original,100,'#77e3c7',29],['② 搬送波：音を運ぶための波',signal.carrier,210,'#bba3ff',22],[receivedLabel,signal.received,320,'#6fbaff',22],['④ 電波から取り出した音',signal.recovered,430,'#ffca7e',29]];
+      ctx.save(); ctx.beginPath(); ctx.rect(24,45,672,445); ctx.clip();
       for (const [label,samples,y,color,scale] of rows) {
         text(label,26,y-39,color,15); line(26,y,694,y,'#304259',1);
         path(Array.from(samples,(v,n) => [26+n/(samples.length-1)*668,y-Math.max(-1.3,Math.min(1.3,v*scale/35))*35]),color,1.4);
       }
       ctx.restore();
-      reading.textContent = `${mode.toUpperCase()}：${values.frequency}Hzの音。${mode === 'am' ? '音に合わせて電波の高さが変わります。' : '音に合わせて電波の間隔が変わります。'} ${values.noise === 0 ? '雑音0で、元の波と復調した波を比べよう。' : noiseType === 'amplitude' && mode === 'fm' ? 'この理想的なFM検波では、振幅だけの揺れは音に現れません。' : '雑音が、取り出した音に混ざります。'} 図の大きさは固定。はみ出す振幅は表示を切り詰めています。`;
+      reading.textContent = `${mode.toUpperCase()}：${values.frequency}Hzの音。${mode === 'am' ? '音に合わせて電波の高さが変わります。' : '音に合わせて電波の間隔が変わります。'} ${values.noise === 0 ? '①と④の波を比べよう。電波から元の音を取り出せています。' : noiseType === 'amplitude' && mode === 'fm' ? 'この理想的なFMの受信では、高さだけの揺れは取り出した音に現れません。' : '電波の乱れが、取り出した音にも現れます。'} ④は音を整えるフィルターを通す前の波形。図の大きさは固定で、はみ出す振幅は切り詰めています。`;
     } else if (id === 'em-wave') {
       text('青：電場 E　赤：磁場 B',26,34); text('進行方向 →',548,364,'#94eac6');
       line(35,210,685,210,'#879ab2');
