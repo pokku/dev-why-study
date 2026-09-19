@@ -102,7 +102,13 @@
     {"id":"polarization","name":"偏光・偏波","summary":"電磁波の電場がどの向きに振動するかを表す性質。アンテナの受信や偏光板に関わる。","kind":"technology","level":"applied","curriculum":"身近な通信と光","field":"通信技術"},
     {"id":"radio-receiver","name":"ラジオ","summary":"電波にのせられた音の情報を選び、取り出して聞く受信機。","kind":"technology","level":"applied","curriculum":"身近な通信と光","field":"通信技術"},
     {"id":"sound-harmonics","name":"倍音と音色","summary":"基本の音の整数倍の周波数を持つ波。混ざり方によって音色が変わる。","kind":"school","level":"high","curriculum":"高校物理","field":"物理"},
-    {"id":"doppler-effect","name":"ドップラー効果","summary":"音源や聞き手の運動によって、聞こえる音の周波数が変わる現象。","kind":"school","level":"high","curriculum":"高校物理","field":"物理"}
+    {"id":"doppler-effect","name":"ドップラー効果","summary":"音源や聞き手の運動によって、聞こえる音の周波数が変わる現象。","kind":"school","level":"high","curriculum":"高校物理","field":"物理"},
+    {"id":"fourier-winding","name":"波を巻くフーリエ解析","summary":"周波数に合わせて波を複素平面に巻き、平均から周波数成分を調べる。","kind":"academic","level":"university","curriculum":"体験から学ぶ数学・物理・情報","field":"数学"},
+    {"id":"sampling-theorem","name":"標本化とエイリアシング","summary":"波を一定間隔の点で読むとき、標本化周波数によって別の波と区別できなくなる。","kind":"academic","level":"university","curriculum":"体験から学ぶ数学・物理・情報","field":"情報"},
+    {"id":"double-slit-interference","name":"二重スリットの干渉","summary":"2つの細い隙間を通った光が重なり、明暗の縞を作る。","kind":"academic","level":"university","curriculum":"体験から学ぶ数学・物理・情報","field":"物理"},
+    {"id":"electromagnetic-induction","name":"電磁誘導","summary":"コイルを貫く磁束の変化によって起電力が生じる現象。","kind":"academic","level":"university","curriculum":"体験から学ぶ数学・物理・情報","field":"物理"},
+    {"id":"thin-lens","name":"薄いレンズと結像","summary":"焦点距離と物体の距離から実像や虚像の位置を求める。","kind":"academic","level":"university","curriculum":"体験から学ぶ数学・物理・情報","field":"物理"},
+    {"id":"monte-carlo-method","name":"モンテカルロ法","summary":"ランダムな試行を繰り返し、確率を使って値を近似する方法。","kind":"academic","level":"university","curriculum":"体験から学ぶ数学・物理・情報","field":"数学"}
   ],
   "edges": [
     { "from": "multiplication", "to": "division", "type": "related", "reason": "掛け算と割り算は互いに逆の計算として量の関係を扱う。" },
@@ -307,7 +313,19 @@
     {"from":"wave","to":"doppler-effect","type":"application","reason":"動く音源から出た波の間隔が聞き手側で変わる。"},
     {"from":"speed","to":"doppler-effect","type":"toolFor","reason":"音速と音源の速度の関係から届く周波数を計算する。"},
     {"from":"fraction","to":"doppler-effect","type":"toolFor","reason":"静止した聞き手に近づく音源では、音速を音速と接近速度の差で割った比を使う。"},
-    {"from":"doppler-effect","to":"car","type":"example","reason":"近づいたり遠ざかったりする車の音の高さが変わる。"}
+    {"from":"doppler-effect","to":"car","type":"example","reason":"近づいたり遠ざかったりする車の音の高さが変わる。"},
+    {"from":"fourier","to":"fourier-winding","type":"develops","reason":"複素指数関数を掛けて平均するフーリエ解析を、波を平面上に巻く操作で表す。"},
+    {"from":"trigonometry","to":"fourier-winding","type":"toolFor","reason":"正弦と余弦を使って、波の各点を平面上の座標に変換する。"},
+    {"from":"signal-processing","to":"sampling-theorem","type":"develops","reason":"アナログ信号を離散的な値として記録するときの条件を調べる。"},
+    {"from":"function","to":"sampling-theorem","type":"toolFor","reason":"時間の関数を一定間隔の点で読み、同じ点を通る別の関数と比較する。"},
+    {"from":"interference","to":"double-slit-interference","type":"develops","reason":"2つのスリットから届く光の位相差で、強め合う位置と弱め合う位置が決まる。"},
+    {"from":"wave","to":"double-slit-interference","type":"toolFor","reason":"光の波長と経路差から、スクリーンの縞の間隔を計算する。"},
+    {"from":"electromagnetism","to":"electromagnetic-induction","type":"develops","reason":"磁束が変化すると起電力が生じる関係を扱う。"},
+    {"from":"calculus","to":"electromagnetic-induction","type":"toolFor","reason":"起電力を磁束の時間微分で計算し、動かす速さとの関係を表す。"},
+    {"from":"wave","to":"thin-lens","type":"develops","reason":"光の進む向きが屈折で変わり、レンズを通った光が像を作る。"},
+    {"from":"fraction","to":"thin-lens","type":"toolFor","reason":"焦点距離・物体距離・像距離の逆数の関係を使う。"},
+    {"from":"probability","to":"monte-carlo-method","type":"develops","reason":"ランダムな試行の割合から、面積や値を推定する。"},
+    {"from":"ratio","to":"monte-carlo-method","type":"toolFor","reason":"円内の点数を全点数で割った割合を、面積の比と対応させる。"}
   ],
   "featuredPaths": [
     {

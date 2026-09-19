@@ -42,6 +42,17 @@
 buildは既存の知識グラフに加えて、公式・科学図の参照先、日常への経路の連結、学校の知識との直接の関係を検査する。ブラウザ表示はオーナーがdev Pagesで確認する。特にスマートフォンでの長い式、図、入口からマップへの遷移、戻る操作を確認する。
 # 電波シリーズ（2026-09-19追加）
 
+## 探究6体験（追加）
+
+- フーリエの巻き取りは既存のフーリエ分解を複素平面で図示。3Hzと振幅0.5の5Hzを4秒・800点で平均する。有限時間の窓による漏れを明記。
+- 標本化: [DSP Guide, The Sampling Theorem](https://www.dspguide.com/ch3/2.htm3)。コサイン単音と、標本点が一致する折り返し周波数の候補を表示。点間の線は一般の信号の復元結果ではない。
+- 二重スリット: [OpenStax, Young’s Double-Slit Interference](https://openstax.org/books/university-physics-volume-3/pages/3-1-youngs-double-slit-interference)。小角近似I/Imax=cos²(πdy/(λL))。スリット幅の回折包絡線を省略。
+- 電磁誘導: [OpenStax, Faraday’s Law](https://openstax.org/books/university-physics-volume-2/pages/13-1-faradays-law)。教材用の規格化磁束Φ=(1+x²)^(-3/2)を使い、ε=−N(dΦ/dx)v。実磁石の場の完全な解や電力・効率のモデルではない。
+- レンズ: [OpenStax, Thin Lenses](https://openstax.org/books/university-physics-volume-3/pages/2-4-thin-lenses)。薄い凸レンズの近軸公式。実像・虚像・焦点上の無限遠を分ける。図は自動縮尺、スクリーンのぼけは模式表示。
+- 円周率: 正方形内の一様疑似乱数と円の面積比を使う。最大5万点、描画は直近3000点、推定値には全点。点を増やすごとに誤差が減る保証はない。
+
+実機確認: 6画面の全スライダーとプリセット、標本化の2倍境界、磁石の停止・反転・端での停止、レンズの実像/虚像/焦点上、点の追加/初期化/5万点停止、スマホの数式と図、戻る・非表示時の停止。計算テスト6件追加済み。配信反映・実機の表示操作は未確認。
+
 ## 音の分解・ドップラー効果（同日追加）
 
 - [Basic Acoustics, Fundamentals of Sound](https://www.acousticslab.org/RECA220/PMFiles/Module02a.htm): 周期信号の倍音とフーリエ合成。体験では6本の正弦波を合成し、1周期512点の波形から正弦・余弦への射影で振幅を再計算する。正弦波、奇数倍音1/nの矩形波近似、全倍音1/nののこぎり波近似を用意。6成分のみなので理想的な角や不連続は再現しない。録音解析ではない。全成分0なら無音。

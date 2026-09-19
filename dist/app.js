@@ -4,6 +4,7 @@ import { labs } from './lab-catalog.js';
 import { createLabGallery, createScienceLab } from './science-labs.js';
 import { createRadioLab } from './radio-labs.js';
 import { createSoundLab } from './sound-labs.js';
+import { createExploreLab } from './explore-labs.js';
 
 const app = document.querySelector('#app');
 const homeTemplate = document.querySelector('#home-template');
@@ -88,6 +89,12 @@ function renderNodeCard(node) {
 }
 
 const academicClusters = {
+  'fourier-winding': '数学',
+  'sampling-theorem': '情報・AI',
+  'double-slit-interference': '物理',
+  'electromagnetic-induction': '電気・通信',
+  'thin-lens': '物理',
+  'monte-carlo-method': '数学',
   'heat-equation': '物理',
   'image-frequency': '情報・AI',
   'mass-energy': '物理',
@@ -639,7 +646,7 @@ function renderRoute() {
   if (route.has('lab')) {
     const definition = labs.find(lab => lab.id === route.get('lab'));
     if (!definition) return renderNotFound();
-    const lab = definition.id === 'string' ? createStringLab() : definition.renderer === 'sound' ? createSoundLab(definition.id, nodesById) : definition.renderer === 'radio' ? createRadioLab(definition.id, nodesById) : createScienceLab(definition.id, nodesById);
+    const lab = definition.id === 'string' ? createStringLab() : definition.renderer === 'explore' ? createExploreLab(definition.id, nodesById) : definition.renderer === 'sound' ? createSoundLab(definition.id, nodesById) : definition.renderer === 'radio' ? createRadioLab(definition.id, nodesById) : createScienceLab(definition.id, nodesById);
     disposeLab = lab.dispose;
     app.replaceChildren(lab.element);
     document.title = `${definition.title}｜どうして勉強しないといけないの？`;

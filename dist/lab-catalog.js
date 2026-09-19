@@ -1,6 +1,8 @@
 import { radioLabs } from './radio-catalog.js';
 import { soundLabs } from './sound-catalog.js';
+import { exploreLabs } from './explore-catalog.js';
 export const labs = [
+  ...exploreLabs,
   ...soundLabs,
   ...radioLabs,
   { id: 'string', title: '弦を弾く', icon: '∿', category: '音と波', question: '長さを半分にすると、何が聞こえる？', nodes: ['wave-equation', 'guitar', 'wave', 'music'] },

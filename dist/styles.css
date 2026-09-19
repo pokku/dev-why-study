@@ -473,6 +473,7 @@ footer p { margin: 0; display: flex; justify-content: space-between; gap: 20px; 
   .science-reading { padding-inline: 17px; }
 }
 .radio-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 22px; }
+.lab-color-winding .lab-gallery-art,.lab-color-sampling .lab-gallery-art,.lab-color-double-slit .lab-gallery-art,.lab-color-induction .lab-gallery-art,.lab-color-lens .lab-gallery-art,.lab-color-monte-carlo .lab-gallery-art { font-size: 3.4rem; background: radial-gradient(ellipse at top right,#3e456f,#142d3e 80%); }
 .lab-color-harmonics .lab-gallery-art,.lab-color-doppler .lab-gallery-art { font-size: 3.5rem; color: #ffcf85; background: radial-gradient(ellipse at 80% 0,#3c466d,#102838 80%); }
 .sound-lab .lab-controls [data-extra] { margin-top: 22px; }
 .radio-lab .lab-equation { align-items: start; }
