@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/validate-data.mjs",
-    "validate": "node scripts/validate-data.mjs"
+    "validate": "node scripts/validate-data.mjs",
+    "test": "node --test scripts/string-physics.test.mjs"
   }
 }

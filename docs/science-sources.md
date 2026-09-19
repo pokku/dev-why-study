@@ -11,6 +11,14 @@
 
 運動方程式は質量一定・慣性系、三平方は直角三角形、オームの法則は一定条件で電圧と電流が比例する抵抗、と適用条件を付記する。
 
-## 表示確認
+## 弦を弾く体験（2026-09-19）
+
+- [UNSW Strings, standing waves and harmonics](https://newt.phys.unsw.edu.au/jw/strings.html): 両端固定の基本振動、f=v/(2L)、張力・線密度が一定のときの長さと振動数の反比例を参照。
+- [UNSW How a guitar works](https://newt.phys.unsw.edu.au/music/guitar/guitarintro.html): 弦の振動が駒・表板を通して空気へ伝わる説明を参照。
+- [MDN createPeriodicWave](https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/createPeriodicWave)、[AudioContext.resume](https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/resume): 明示操作による音声開始、倍音付き合成音に使用。
+
+図は理想弦の基本振動（200倍スロー）で、音は同じ基本周波数に倍音を加えた合成音。ギター音の実測・実物再現ではなく、長さと音の高さの関係を確かめるモデル。見た目・音の減衰は演出として追加する。
+
+## 表示確認の補足
 
 buildは既存の知識グラフに加えて、公式・科学図の参照先、日常への経路の連結、学校の知識との直接の関係を検査する。ブラウザ表示はオーナーがdev Pagesで確認する。特にスマートフォンでの長い式、図、入口からマップへの遷移、戻る操作を確認する。

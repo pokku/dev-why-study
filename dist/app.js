@@ -1,4 +1,5 @@
 import { formulas, scenes, formulaMarkup } from './discoveries.js';
+import { createStringLab } from './string-lab.js';
 
 const app = document.querySelector('#app');
 const homeTemplate = document.querySelector('#home-template');
@@ -26,6 +27,7 @@ const relationMeta = {
 let knowledge = { nodes: [], edges: [], featuredPaths: [] };
 let nodesById = new Map();
 let lastExplorer = 'formula';
+let disposeLab = null;
 
 function navigateToNode(id) {
   location.hash = `node=${encodeURIComponent(id)}`;
@@ -109,6 +111,7 @@ const academicClusters = {
 };
 
 const schoolRoutes = {
+  'inverse-proportion': [['小学校', '小6・算数'], ['中学校', '中1・数学']],
   'ohms-law': [['中学校', '中2・理科'], ['高校', '高校・物理']],
   multiplication: [['小学校', '小2・算数'], ['小学校', '小3・算数']],
   division: [['小学校', '小3・算数'], ['小学校', '小4・算数']],
@@ -330,6 +333,11 @@ function renderHome() {
   });
   const requested = new URLSearchParams(location.hash.slice(1)).get('explore');
   renderExplorer(explorerMeta[requested] ? requested : 'formula', [], Boolean(requested));
+  const invitation = document.createElement('a');
+  invitation.className = 'lab-invitation';
+  invitation.href = '#lab=string';
+  invitation.innerHTML = '<span>触って、聞いて、わかる</span><strong>波動方程式から、ギターの音へ。</strong><span>弦の長さを変えて弾いてみる →</span>';
+  app.querySelector('#explorer-section').before(invitation);
 }
 
 function buildMindMap(rootId, limit = 15) {
@@ -517,6 +525,14 @@ function renderMindMap(id) {
   inspector.append(meta, relationTitle, relationList);
   layout.append(canvasWrap, inspector);
   page.append(toolbar);
+  if (['wave-equation', 'wave', 'guitar', 'music'].includes(id)) {
+    const experiment = document.createElement('a');
+    experiment.className = 'lab-invitation is-map';
+    experiment.href = '#lab=string';
+    experiment.innerHTML = '<strong>このつながりを、音で試そう。</strong><span>弦を短くすると、音はどう変わる？ →</span>';
+    page.append(experiment);
+    page.classList.add('has-experiment');
+  }
   if (formula) {
     const discovery = document.createElement('section');
     discovery.className = 'discovery-trail';
@@ -590,6 +606,16 @@ function updateSearch() {
 }
 
 function renderRoute() {
+  if (disposeLab) { disposeLab(); disposeLab = null; }
+  if (new URLSearchParams(location.hash.slice(1)).get('lab') === 'string') {
+    const lab = createStringLab();
+    disposeLab = lab.dispose;
+    app.replaceChildren(lab.element);
+    document.title = '弦を弾いて、波を知る｜どうして勉強しないといけないの？';
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    app.focus({ preventScroll: true });
+    return;
+  }
   const id = getRoute();
   if (id) renderMindMap(id);
   else renderHome();

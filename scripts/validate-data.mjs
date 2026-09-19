@@ -27,6 +27,10 @@ for (const edge of data.edges ?? []) {
 }
 
 const connected = new Set(data.edges.flatMap((edge) => [edge.from, edge.to]));
+const labSource = await readFile(new URL('../dist/string-lab.js', import.meta.url), 'utf8');
+for (const [, id] of labSource.matchAll(/href="#node=([a-z0-9-]+)"/g)) {
+  if (!ids.has(id)) problems.push(`弦の体験からのリンク先が存在しない: ${id}`);
+}
 for (const id of ids) {
   if (!connected.has(id)) problems.push(`孤立したノード: ${id}`);
 }

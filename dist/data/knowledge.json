@@ -85,7 +85,9 @@
     {"id":"ohms-law","name":"オームの法則","summary":"抵抗に加える電圧と流れる電流の関係。電圧と電流が比例する抵抗では、電圧＝電流×抵抗で計算できる。","kind":"school","curriculum":"中学校2年・理科","field":"物理・電気"},
     {"id":"nuclear-fusion","name":"核融合","summary":"軽い原子核どうしが結びつく反応。太陽では主に水素からヘリウムができ、反応前後の質量の差に対応するエネルギーが放出される。","kind":"academic","curriculum":"高校物理〜大学","field":"物理"},
     {"id":"sun","name":"太陽の光","summary":"太陽の中心で生まれたエネルギーが長い過程を経て表面から放射され、地球の明るさや暖かさを支える。","kind":"interest","curriculum":"日光・暮らし・宇宙","field":"宇宙"},
-    {"id":"airplane","name":"飛行機","summary":"翼のまわりの空気の流れや力を調べ、機体の形や飛び方を設計する。流体力学と力学がつながる身近な乗り物。","kind":"interest","curriculum":"旅行・乗り物","field":"乗り物"}
+    {"id":"airplane","name":"飛行機","summary":"翼のまわりの空気の流れや力を調べ、機体の形や飛び方を設計する。流体力学と力学がつながる身近な乗り物。","kind":"interest","curriculum":"旅行・乗り物","field":"乗り物"},
+    {"id":"guitar","name":"ギターの弦","summary":"弦を弾くと振動が生まれる。同じ張り・太さの理想的な弦なら、振動する長さを半分にすると振動数が2倍になり、1オクターブ高くなる。","kind":"interest","curriculum":"楽器・音楽","field":"音楽"},
+    {"id":"inverse-proportion","name":"反比例","summary":"一方が2倍になると他方が半分になるなど、2つの量の積が一定になる関係。同じ条件の弦では、長さと基本振動数が反比例する。","kind":"school","curriculum":"小学校6年〜中学校1年","field":"算数・数学"}
   ],
   "edges": [
     { "from": "multiplication", "to": "division", "type": "related", "reason": "掛け算と割り算は互いに逆の計算として量の関係を扱う。" },
@@ -238,7 +240,13 @@
     {"from":"vector","to":"navier-stokes","type":"prerequisite","reason":"流れの速さと向きをまとめて、速度のベクトル場として扱う。"},
     {"from":"calculus","to":"navier-stokes","type":"prerequisite","reason":"流速が時間や空間でどう変化するかを微分で表す。"},
     {"from":"navier-stokes","to":"fluid","type":"related","reason":"流体の運動を表す中心的な方程式で、条件に応じてさまざまな形を使う。"},
-    {"from":"fluid","to":"airplane","type":"application","reason":"翼のまわりの流れや圧力、機体に働く力を調べる。"}
+    {"from":"fluid","to":"airplane","type":"application","reason":"翼のまわりの流れや圧力、機体に働く力を調べる。"},
+    {"from":"wave-equation","to":"guitar","type":"application","reason":"張った弦を両端固定の波として扱い、長さや張力から振動の性質を調べる。"},
+    {"from":"guitar","to":"music","type":"example","reason":"弦の振動がギターの胴などを通して空気を揺らし、音楽として耳に届く。"},
+    {"from":"wave","to":"guitar","type":"example","reason":"弦の上を進む波が端で反射し、定常波として振動する。"},
+    {"from":"inverse-proportion","to":"guitar","type":"usedIn","reason":"張力と線密度が一定なら、弦の基本振動数は振動する長さに反比例する。"},
+    {"from":"function","to":"inverse-proportion","type":"example","reason":"反比例はy=a/xで表せる関数の例で、比例とは異なる変化をする。"},
+    {"from":"trigonometry","to":"guitar","type":"toolFor","reason":"弦の基本振動や倍音を、位置と時間に対するsin・cosで表せる。"}
   ],
   "featuredPaths": [
     {
