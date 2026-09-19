@@ -1,5 +1,13 @@
 # 公式・科学の図の参照資料
 
+## 興味の入口の拡充
+
+2026-09-19: 9分野に再編し36テーマを追加。各テーマは独自の要約と、基礎になる知識2本・具体的な利用場面1本の関係を持つ。動く体験の新規追加とは区別する。
+
+- 医療画像の原理: [NIH/NIBIB MRI](https://www.nibib.nih.gov/science-education/science-topics/magnetic-resonance-imaging-mri)、[NIH/NIBIB Ultrasound](https://www.nibib.nih.gov/science-education/science-topics/ultrasound)。磁場・高周波信号と超音波の反射という原理の入口を説明。診断や検査選択の助言は扱わない。
+- 降水確率の意味: [気象庁 天気予報・天気図のFAQ](https://www.jma.go.jp/jma/kishou/know/faq/faq4.html)。日本の予報は指定時間帯に1mm以上の降水がある確率で、雨量や時間割合とは区別する。
+- 光学・電磁誘導・音響の新テーマは本資料の既存出典と対応。数学の比例・割合・座標・速度の説明は、各テーマのどの計算に使うかを具体化する。
+
 確認日: 2026-09-19。説明文・MathML・SVGは自作。提供画像は見せ方の参考とし、転載していない。
 
 - 質量とエネルギー、太陽の核融合: [CERNの教材](https://cds.cern.ch/record/2905272/files/4_Passport_E-mc2.pdf)、[Einstein Online](https://www.einstein-online.info/en/spotlights/sr/sr-sub03/)。Eは静止エネルギーと明記。太陽への経路は核融合を介する。

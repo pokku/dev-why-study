@@ -156,6 +156,8 @@ main { min-height: calc(100vh - 140px); }
 .explorer-choice { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 64px; padding: 14px 16px; color: var(--ink); background: #f7f9fc; border: 1px solid #dae2ed; border-radius: 13px; cursor: pointer; text-align: left; transition: border-color .18s, transform .18s, background .18s; }
 .explorer-choice:hover { transform: translateY(-2px); background: #f1f5ff; border-color: #9eb5ee; }
 .explorer-choice strong { font-size: .92rem; }
+.explorer-choice-copy { display:grid; gap:8px; min-width:0; }
+.explorer-choice-copy small { font-size:.76rem; color:#5b7284; line-height:1.7; font-weight:400; }
 .explorer-choice span { flex: 0 0 auto; color: var(--muted); font-size: .67rem; }
 .explorer-topic { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 86px; padding: 15px 17px; background: #fff; border: 1px solid #dbe3ee; border-left: 5px solid var(--kind-color); border-radius: 13px; cursor: pointer; text-align: left; transition: transform .18s, box-shadow .18s; }
 .explorer-topic:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(16,29,56,.09); }

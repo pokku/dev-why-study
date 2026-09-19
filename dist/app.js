@@ -4,6 +4,7 @@ import { labs } from './lab-catalog.js';
 import { createScienceLab } from './science-labs.js';
 import { createHomePortal, createJourney, createLearningLibrary, createNotebook, attachLearning } from './learning-ui.js';
 import { journeys, matchLabs } from './learning-data.js';
+import { interestGroups, interestPaths } from './interest-groups.js';
 import { createRadioLab } from './radio-labs.js';
 import { createSoundLab } from './sound-labs.js';
 import { createExploreLab } from './explore-labs.js';
@@ -231,6 +232,7 @@ function renderDiscoveryCard(item, isFormula) {
 }
 
 function explorerPaths(kind) {
+  if (kind === 'interest') return interestPaths(knowledge.nodes);
   const nodes = kind === 'interest'
     ? knowledge.nodes.filter((node) => ['interest', 'technology', 'career'].includes(node.kind))
     : kind === 'academic'
@@ -283,7 +285,7 @@ function renderExplorer(kind, selection = [], shouldScroll = false) {
   if (discovery) {
     (kind === 'formula' ? formulas : scenes).forEach((item) => options.append(renderDiscoveryCard(item, kind === 'formula')));
   } else if (nextLabels.length) {
-    const preferredOrder = ['小学校', '中学校', '高校', '数学', '物理', '情報・AI', '電気・通信'];
+    const preferredOrder = ['小学校', '中学校', '高校', '数学', '物理', '情報・AI', '電気・通信', ...interestGroups.map(group => group.title)];
     nextLabels.sort((a, b) => {
       const aIndex = preferredOrder.indexOf(a);
       const bIndex = preferredOrder.indexOf(b);
@@ -299,9 +301,17 @@ function renderExplorer(kind, selection = [], shouldScroll = false) {
       const name = document.createElement('strong');
       name.textContent = label;
       const count = document.createElement('span');
-      count.textContent = `${uniqueNodes}単元`;
-      button.append(name, count);
-      button.addEventListener('click', () => renderExplorer(kind, [...selection, label]));
+      count.textContent = `${uniqueNodes}${kind === 'school' ? '単元' : 'テーマ'}`;
+      const copy = document.createElement('div');
+      copy.className = 'explorer-choice-copy';
+      copy.append(name);
+      if (kind === 'interest') {
+        const examples = document.createElement('small');
+        examples.textContent = [...new Map(matching.map(path => [path.node.id, path.node.name])).values()].slice(0, 4).join('・');
+        copy.append(examples);
+      }
+      button.append(copy, count);
+      button.addEventListener('click', () => kind !== 'school' && uniqueNodes === 1 ? navigateToNode(matching[0].node.id) : renderExplorer(kind, [...selection, label]));
       options.append(button);
     });
   } else {

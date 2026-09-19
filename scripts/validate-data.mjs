@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { formulas, scenes } from '../dist/discoveries.js';
 import { labs } from '../dist/lab-catalog.js';
 import { journeys, learning, everydayLinks } from '../dist/learning-data.js';
+import { interestGroups } from '../dist/interest-groups.js';
 
 const source = new URL('../dist/data/knowledge.json', import.meta.url);
 const data = JSON.parse(await readFile(source, 'utf8'));
@@ -18,6 +19,12 @@ for (const node of data.nodes ?? []) {
 }
 
 const edgeKeys = new Set();
+const interestIds = new Set();
+for (const group of interestGroups) {
+  if (group.nodes.length < 4 || new Set(group.nodes).size !== group.nodes.length) problems.push(`興味の分類が不足・重複: ${group.title}`);
+  for (const id of group.nodes) { if (!ids.has(id)) problems.push(`興味の分類の参照不正: ${id}`); interestIds.add(id); }
+}
+for (const node of data.nodes) if (['interest','technology','career'].includes(node.kind) && !interestIds.has(node.id)) problems.push(`興味の入口にないテーマ: ${node.id}`);
 for (const edge of data.edges ?? []) {
   if (!ids.has(edge.from)) problems.push(`存在しない接続元: ${edge.from}`);
   if (!ids.has(edge.to)) problems.push(`存在しない接続先: ${edge.to}`);
