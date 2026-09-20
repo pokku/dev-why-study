@@ -650,3 +650,15 @@ body:has(.mindmap-page) #app { min-height:0; overflow:hidden; }
  #app .mindmap-page.has-map-play .mindmap-layout { grid-template-columns:minmax(0,1fr) 280px; grid-template-rows:minmax(0,1fr); }
  #app .mindmap-toolbar { min-height:32px; }
 }
+
+/* Generous touch targets for every experiment, including embedded mini labs. */
+#app input[type=range] { -webkit-appearance:none; appearance:none; display:block; width:100%; min-width:0; height:52px; margin:8px 0; padding:0; background:transparent; cursor:ew-resize; touch-action:none; --range-thumb:32px; }
+#app input[type=range]::-webkit-slider-runnable-track { height:8px; border-radius:999px; background:#b7d3d5; border:1px solid #8fb5bc; }
+#app input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:var(--range-thumb); height:var(--range-thumb); margin-top:calc((6px - var(--range-thumb))/2); border:3px solid white; border-radius:50%; background:#087d75; box-shadow:0 1px 5px #234c5966; }
+#app input[type=range]::-moz-range-track { height:6px; border-radius:999px; background:#b7d3d5; border:1px solid #8fb5bc; }
+#app input[type=range]::-moz-range-thumb { box-sizing:border-box; width:var(--range-thumb); height:var(--range-thumb); border:3px solid white; border-radius:50%; background:#087d75; box-shadow:0 1px 5px #234c5966; }
+#app input[type=range]:focus-visible { outline:3px solid #286dba; outline-offset:2px; border-radius:10px; }
+#app input[type=range]:active::-webkit-slider-thumb { background:#075750; box-shadow:0 0 0 6px #087d7526; }
+#app input[type=range]:active::-moz-range-thumb { background:#075750; box-shadow:0 0 0 6px #087d7526; }
+@media(pointer:coarse) { #app input[type=range] { height:56px; --range-thumb:40px; } }
+@media(forced-colors:active) { #app input[type=range] { appearance:auto; -webkit-appearance:auto; } }
