@@ -568,3 +568,13 @@ footer p { margin: 0; display: flex; justify-content: space-between; gap: 20px; 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+.intuition-guide { margin: 24px 0; padding: clamp(18px, 3vw, 32px); border: 1px solid #b9d8de; border-radius: 18px; background: #f3faf9; color: #14354a; }
+.intuition-guide h2 { margin: 8px 0 12px; font-size: clamp(1.25rem, 2.5vw, 1.65rem); }
+.intuition-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; padding-left: 24px; margin: 24px 0; }
+.intuition-steps li { padding-left: 4px; }
+.intuition-steps li::marker { color: #087d78; font-weight: 800; }
+.intuition-steps h3 { margin: 0 0 10px; font-size: 1.05rem; }
+.intuition-guide p { line-height: 1.9; overflow-wrap: anywhere; }
+.intuition-note { border-top: 1px solid #c8dfe1; padding-top: 16px; }
+.intuition-note summary { cursor: pointer; font-weight: 700; }
+@media (max-width: 760px) { .intuition-steps { grid-template-columns: 1fr; gap: 16px; } }

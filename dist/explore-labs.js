@@ -23,7 +23,7 @@ export function createExploreLab(id,nodesById){
   button('1コマ進める',()=>{pause();advance(.1);render();});button('最初から',()=>{pause();ended=false;if(id==='induction')set('position',-1.5);else{points=[];history=[];total=inside=0;random=seededRandom(Math.floor(Math.random()*4294967296));}render();status.textContent='初期化しました。';});
  }
  if(id==='induction'){button('磁石を止める',()=>{pause();set('velocity',0);});button('進む向きを逆に',()=>set('velocity',values.velocity===0?1:-values.velocity));}
- if(id==='monte-carlo'){button('100点落とす',()=>{addPoints(100);render();});button('1000点落とす',()=>{addPoints(1000);render();});}
+ if(id==='monte-carlo'){button('100点打つ',()=>{addPoints(100);render();});button('1000点打つ',()=>{addPoints(1000);render();});}
  function pause(){running=false;cancelAnimationFrame(frame);if(playButton)playButton.textContent='▶ 動かす';}
  function advance(dt){if(id==='induction'){values.position=Math.max(-3,Math.min(3,values.position+values.velocity*dt));inputs.get('position').value=values.position;element.querySelector('output[for="explore-position"]').textContent=values.position.toFixed(2);if(Math.abs(values.position)>=3){ended=true;pause();status.textContent='端で停止しました。向きか位置を変えて再開できます。';}}else{elapsed+=dt;if(elapsed>=.1){addPoints(100);elapsed=0;}}}
  function tick(now){if(!running||disposed)return;advance(Math.min(.05,(now-last)/1000));last=now;render();if(running)frame=requestAnimationFrame(tick);}
@@ -69,10 +69,15 @@ export function createExploreLab(id,nodesById){
    result(!Number.isFinite(b)?'物体が焦点上にあるため、出ていく光は平行。像は無限遠です。':b<0?`像距離${b.toFixed(2)}cm。物体と同じ側に正立の虚像ができ、スクリーンには映りません。`:`像距離${b.toFixed(2)}cm、倍率${(-b/a).toFixed(2)}（倒立）。スクリーンは${s.toFixed(2)}cm。${Math.abs(s-b)<.05?'ピントが合っています。':'スクリーンを像距離に合わせてみよう。'}`);
   }else{
    const left=35,top=65,size=340;ctx.strokeStyle='#a9bbcf';ctx.strokeRect(left,top,size,size);ctx.beginPath();ctx.arc(left+size/2,top+size/2,size/2,0,TAU);ctx.stroke();for(const p of points)dot(left+(p.x+1)*size/2,top+(p.y+1)*size/2,1.5,p.inside?'#72d9bf':'#f5a1a0');
-   text('緑：円の中　桃：円の外',30,35);text(`${total.toLocaleString()} 点`,410,90,'#eaf3ff',25);text(total?`π ≈ ${(4*inside/total).toFixed(5)}`:'点を落としてみよう',410,145,'#77e3c7',24);text(`円の中 ${inside.toLocaleString()} 点`,410,190);
+   path([[left+size/2,top+size/2],[left+size,top+size/2]],'#ffffff',2);
+   text('半径1',left+size/2+35,top+size/2-12,'#ffffff',18);
+   text('円の面積 π × 1 × 1 = π',40,440,'#72d9bf',18);
+   text('正方形：一辺2、面積2 × 2 = 4',40,466,'#dceafa',18);
+   text('緑：円の中　桃：円の外',30,35);text(`${total.toLocaleString()} 点`,410,90,'#eaf3ff',25);text(total?`π ≈ ${(4*inside/total).toFixed(5)}`:'点を打ってみよう',410,145,'#77e3c7',24);text(`円の中 ${inside.toLocaleString()} 点`,410,190);
+   text(total?`割合 ${(100*inside/total).toFixed(2)}%`:'割合を4倍すると π',410,235,'#72d9bf',20);
    path([[410,325],[690,325]],'#617994',1);text('3.14159…',410,350,'#a1b5c8',14);if(history.length>1)path(history.map(p=>[410+p.n/total*280,325-Math.max(-1,Math.min(1,p.estimate-Math.PI))*70]),'#ffca7c',2);
    text('推定値の変化（上下±1）',410,390,undefined,15);
-   result(total?`4 × ${inside} ÷ ${total} = ${(4*inside/total).toFixed(6)}。πとの差は${Math.abs(4*inside/total-Math.PI).toFixed(6)}。点を増やすと誤差は一般に小さくなりますが、毎回改善するとは限りません。図は直近${points.length}点です。`:'半径1の円の面積はπ、正方形の面積は4。点が円に入る割合からπを推定します。');
+   result(total?`① 全${total}点のうち、円内は${inside}点。② 割合は${inside} ÷ ${total} = ${(inside/total).toFixed(6)}（約${(100*inside/total).toFixed(2)}%）。③ この割合がπ/4に近づくので、4倍するとπ ≈ ${(4*inside/total).toFixed(6)}。πとの差は${Math.abs(4*inside/total-Math.PI).toFixed(6)}。毎回誤差が減るとは限りません。図は直近${points.length}点、計算は全${total}点です。`:'半径1の円の面積はπ。囲む正方形は一辺2なので面積4。均等にランダムな位置へ点を打つと、円内の割合はπ/4に近づきます。その割合を4倍してπを推定します。');
   }
  }
  const hidden=()=>{if(document.hidden)pause();},change=()=>{if(reduced.matches)pause();};document.addEventListener('visibilitychange',hidden);window.addEventListener('pagehide',pause);reduced.addEventListener('change',change);render();

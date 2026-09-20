@@ -3,6 +3,7 @@ import { formulas, scenes } from '../dist/discoveries.js';
 import { labs } from '../dist/lab-catalog.js';
 import { journeys, learning, everydayLinks } from '../dist/learning-data.js';
 import { interestGroups } from '../dist/interest-groups.js';
+import { intuition } from '../dist/intuition.js';
 
 const source = new URL('../dist/data/knowledge.json', import.meta.url);
 const data = JSON.parse(await readFile(source, 'utf8'));
@@ -38,6 +39,8 @@ for (const edge of data.edges ?? []) {
 const connected = new Set(data.edges.flatMap((edge) => [edge.from, edge.to]));
 const labIds = new Set();
 for (const lab of labs) {
+  const explanation = intuition[lab.id];
+  if (!explanation || !explanation[0] || !explanation[2] || explanation[1]?.length !== 3 || explanation[1].some(step => step.length !== 2 || step.some(text => !text))) problems.push(`具体例の説明不足: ${lab.id}`);
   if (labIds.has(lab.id)) problems.push(`体験IDの重複: ${lab.id}`);
   labIds.add(lab.id);
   for (const node of lab.nodes) if (!ids.has(node)) problems.push(`体験のリンク切れ: ${lab.id} -> ${node}`);

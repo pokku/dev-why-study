@@ -1,4 +1,5 @@
 import { labs } from './lab-catalog.js';
+import { intuition } from './intuition.js';
 import { journeys,learning,everydayLinks,matchLabs,cleanProgress } from './learning-data.js';
 const ids=labs.map(l=>l.id),key='why-study-discoveries-v1';
 let progress={records:{},last:null},persistent=true;
@@ -45,6 +46,14 @@ export function attachLearning(element,labId,journeyId,nodesById){
  if(journey){const index=journey.steps.findIndex(([id])=>id===labId),nav=node('nav','learning-route-bar');nav.setAttribute('aria-label','探索ルート');nav.append(link(`← ${journey.title}`,`#journey=${journey.id}`),node('span','',`${index+1} / ${journey.steps.length}`));if(index>0)nav.append(link('前の体験',labUrl(journey.steps[index-1][0],journey.id)));if(index+1<journey.steps.length)nav.append(link('次の体験 →',labUrl(journey.steps[index+1][0],journey.id)));element.querySelector('.lab-heading').before(nav);}
  const mission=node('section','learning-mission');mission.innerHTML='<span class="micro-label">まず、ひとつ確かめよう</span>';mission.append(node('p','',info[0]));const hint=node('details','');hint.append(node('summary','','試したあとに、気づくポイントを見る'),node('p','',info[1]));mission.append(hint);element.querySelector('.lab-heading').after(mission);
  const footer=node('section','learning-connections');footer.innerHTML='<div class="learning-section-title"><h2>ここから、何につながる？</h2><p>今見た変化を、学校の言葉でも考えてみよう。</p></div>';
+ const explanation=intuition[labId];
+ if(explanation){
+  const section=node('section','intuition-guide');section.append(node('p','micro-label','具体例から、式の意味をつかむ'),node('h2','',explanation[0]),node('p','learning-fine','ここからは説明用の例です。操作中の設定値とは別に、順に考えてみよう。'));
+  const steps=node('ol','intuition-steps');
+  for(const [title,body] of explanation[1]){const step=node('li','');step.append(node('h3','',title),node('p','',body));steps.append(step);}
+  const detail=node('details','intuition-note');detail.append(node('summary','','ここを区別すると、もっと分かる'),node('p','',explanation[2]));section.append(steps,detail);
+  const anchor=element.querySelector('.lab-discovery, .lab-equation');if(anchor)anchor.before(section);else element.append(section);
+ }
  const bridges=node('div','learning-bridges');const world=everydayLinks[labId];const everyday=node('div','learning-school-bridge');everyday.append(node('h3','','身近な世界へ'),node('p','',world[1]),link(`${nodesById.get(world[0]).name}へつなぐ →`,`#node=${world[0]}`));const school=node('div','learning-school-bridge');school.append(node('h3','','学校の勉強へ'),node('p','',info[2]),link(`${nodesById.get(info[3]).name}の知識マップへ →`,`#node=${info[3]}`));bridges.append(everyday,school);footer.append(bridges);
  const record=node('section','learning-record');record.innerHTML='<h3>自分の気づきを残す</h3><label for="discovery-note">何が変わった？ どんな疑問が残った？（任意・280文字まで）</label><textarea id="discovery-note" maxlength="280" rows="3" placeholder="例：長さを半分にしたら音が高くなった。太さでも変わるのかな？"></textarea><div class="learning-nav" data-record-actions></div><p role="status" data-record-status></p>';
  const textarea=record.querySelector('textarea'),recordStatus=record.querySelector('[data-record-status]');textarea.value=progress.records[labId]?.note||'';
