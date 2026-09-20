@@ -607,3 +607,46 @@ button.mindmap-edge-label:focus-visible,button.mindmap-edge-label[aria-pressed=t
 @keyframes connectionReveal { from { opacity:.25; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 @media(max-width:720px) { .mindmap-page.has-map-play .mindmap-layout { min-height:0; } button.mindmap-edge-label { font-size:.55rem; max-width:72px; } .map-play-invitation a { display:block; } }
 @media(prefers-reduced-motion:reduce) { .connection-chain .is-revealed { animation:none; } }
+/* Keep the map visible; only the selected explanation scrolls. */
+body:has(.mindmap-page) { height:100dvh; display:grid; grid-template-rows:auto auto minmax(0,1fr); overflow:hidden; }
+body:has(.mindmap-page) #app { min-height:0; overflow:hidden; }
+#app .mindmap-page.has-map-play { height:100%; min-height:0; padding:10px 14px; overflow:hidden; }
+#app .mindmap-page.has-map-play .mindmap-layout { flex:1; min-height:0; grid-template-columns:minmax(0,1fr) clamp(280px,28vw,390px); align-items:stretch; overflow:hidden; }
+#app .mindmap-page.has-map-play .mindmap-canvas-wrap { min-height:0; overflow:hidden; }
+#app .mindmap-page.has-map-play .mindmap-canvas { flex:1; height:auto; min-height:0; }
+#app .mindmap-page .mindmap-toolbar { flex-shrink:0; margin-bottom:8px; }
+#app .map-desk { display:flex; flex-direction:column; min-height:0; padding:12px; overflow:hidden; }
+.map-desk-tabs { display:flex; flex-wrap:wrap; gap:4px; flex-shrink:0; padding-bottom:10px; }
+.map-desk-tabs a { color:#cee1ef; padding:9px 10px; border-radius:8px; text-decoration:none; font-size:.8rem; border:1px solid #455c76; }
+.map-desk-tabs a[aria-current] { background:#b8ede2; color:#123841; font-weight:800; }
+.map-desk-panel { overflow:auto; min-height:0; overscroll-behavior:contain; scrollbar-width:thin; }
+.map-desk-panel[hidden],.lab-detail-switch [hidden] { display:none!important; }
+#app .map-desk .inspector-relations { max-height:none; overflow:visible; }
+.map-desk-panel>a { display:block; padding:14px; margin:12px 0; border-radius:10px; background:#e7f6f0; color:#12505a; font-weight:700; }
+.map-desk-panel p { line-height:1.75; }
+.map-desk-panel .lab-invitation,.map-desk-panel .discovery-trail { display:flex; flex-direction:column; align-items:stretch; margin:0 0 12px; padding:14px; }
+.map-desk-panel .map-play-invitation,.map-desk-panel .map-edge-reason { margin:0 0 14px; padding:14px; }
+.map-desk-panel .map-edge-reason h2,.map-desk-panel .map-mini h3 { color:#17384d; }
+.map-desk-panel .map-play-invitation a { display:block; }
+.map-desk-panel .formula-condition,.map-desk-panel .formula-explanation { color:#c7d8e9; }
+.lab-detail-switch { margin:20px 0; }
+.lab-detail-switch>nav { display:flex; flex-wrap:wrap; gap:6px; position:sticky; top:0; z-index:5; background:#f0f5fb; padding:10px; border-radius:12px; }
+.lab-detail-switch button { padding:10px 14px; border:1px solid #b3cbd6; border-radius:8px; background:white; color:#14354a; cursor:pointer; }
+.lab-detail-switch button[aria-pressed=true] { background:#153c50; color:white; }
+@media(max-width:720px) {
+ #app .mindmap-page.has-map-play { padding:6px; }
+ #app .mindmap-page.has-map-play .mindmap-layout { display:grid; grid-template-columns:1fr; grid-template-rows:minmax(0,1.15fr) minmax(0,1fr); gap:6px; }
+ #app .mindmap-page .mindmap-toolbar { min-height:40px; }
+ #app .mindmap-toolbar>div>span { display:none; }
+ #app .mindmap-legend { display:none; }
+ #app .map-desk { padding:8px; border-radius:14px; }
+ .map-desk-tabs { padding-bottom:6px; gap:3px; }
+ .map-desk-tabs a { padding:7px 9px; font-size:.72rem; }
+ #app .mindmap-node { min-height:28px; padding:5px 7px; }
+ #app .mindmap-node.is-root { min-height:44px; padding:7px; }
+ #app .mindmap-node.is-root small { display:none; }
+}
+@media(max-height:500px) and (orientation:landscape) {
+ #app .mindmap-page.has-map-play .mindmap-layout { grid-template-columns:minmax(0,1fr) 280px; grid-template-rows:minmax(0,1fr); }
+ #app .mindmap-toolbar { min-height:32px; }
+}

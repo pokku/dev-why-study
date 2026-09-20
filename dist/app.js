@@ -9,6 +9,7 @@ import { createRadioLab } from './radio-labs.js';
 import { createSoundLab } from './sound-labs.js';
 import { createExploreLab } from './explore-labs.js';
 import { trailInvitation, createConnectionTrail, createEdgeReason } from './map-play.js';
+import { arrangeMapDesk, compactLabDetails } from './map-desk.js';
 
 const app = document.querySelector('#app');
 const homeTemplate = document.querySelector('#home-template');
@@ -378,7 +379,7 @@ function buildMindMap(rootId, limit = 15) {
   const direct = connectedEdges(rootId)
     .map((edge) => ({ edge, connection: connectionFor(edge, rootId) }))
     .filter((item) => item.connection.other)
-    .slice(0, 8);
+    .slice(0, Math.min(8, limit - 1));
   const visibleIds = new Set([rootId, ...direct.map((item) => item.connection.other.id)]);
   const second = [];
 
@@ -454,7 +455,7 @@ function renderMindMap(id) {
   const back = makeButton('mindmap-back', '← 入口へ戻る', () => { location.hash = `explore=${lastExplorer}`; });
   const heading = document.createElement('div');
   const eyebrow = document.createElement('span');
-  eyebrow.textContent = '2段先までを一望';
+  eyebrow.textContent = '線から理由を掘り下げる';
   const title = document.createElement('h1');
   title.textContent = `${node.name}から広がる地図`;
   heading.append(eyebrow, title);
@@ -470,10 +471,10 @@ function renderMindMap(id) {
   canvas.className = 'mindmap-canvas';
   canvas.setAttribute('aria-label', `${node.name}を中心にした知識マップ`);
 
-  const nodeLimit = window.matchMedia('(max-width: 720px)').matches ? 11 : 15;
+  const nodeLimit = window.matchMedia('(max-width: 720px)').matches ? 7 : 15;
   const positions = buildMindMap(id, nodeLimit).map((item, index) => ({ ...item, order: index }));
   const positionsById = new Map(positions.map((item) => [item.connection.other.id, item]));
-  const openEdge = edge => { location.hash = `node=${id}&edge=${knowledge.edges.indexOf(edge)}`; };
+  const openEdge = edge => { location.hash = `node=${id}&edge=${knowledge.edges.indexOf(edge)}&view=relations`; };
   const edgeParam = new URLSearchParams(location.hash.slice(1)).get('edge');
   const chosenEdge = edgeParam !== null && /^\d+$/.test(edgeParam) ? knowledge.edges[Number(edgeParam)] : null;
   const selectedEdge = chosenEdge && (connectedEdges(id).includes(chosenEdge) || positions.some(p=>p.edge===chosenEdge)) ? chosenEdge : null;
@@ -615,9 +616,11 @@ function renderMindMap(id) {
   }
   page.classList.add('has-map-play');
   page.append(layout, trailInvitation(id));
+  const deskPanel=arrangeMapDesk(page,{node,inspector,reasonPanel,formula});
   app.append(page);
-  if(reasonPanel){reasonPanel.focus({preventScroll:true});reasonPanel.scrollIntoView({block:'nearest',behavior:'instant'});}
-  else app.focus({ preventScroll: true });
+  window.scrollTo({top:0,behavior:'instant'});
+  if(new URLSearchParams(location.hash.slice(1)).has('view'))deskPanel.focus({preventScroll:true});
+  else app.focus({preventScroll:true});
 }
 
 function renderNotFound() {
@@ -703,6 +706,7 @@ function renderRoute() {
     const lab = definition.id === 'string' ? createStringLab() : definition.renderer === 'explore' ? createExploreLab(definition.id, nodesById) : definition.renderer === 'sound' ? createSoundLab(definition.id, nodesById) : definition.renderer === 'radio' ? createRadioLab(definition.id, nodesById) : createScienceLab(definition.id, nodesById);
     disposeLab = lab.dispose;
     attachLearning(lab.element, definition.id, route.get('journey'), nodesById);
+    compactLabDetails(lab.element);
     app.replaceChildren(lab.element);
     document.title = `${definition.title}｜どうして勉強しないといけないの？`;
     window.scrollTo({ top: 0, behavior: 'instant' });
