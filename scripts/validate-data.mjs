@@ -4,6 +4,7 @@ import { labs } from '../dist/lab-catalog.js';
 import { journeys, learning, everydayLinks } from '../dist/learning-data.js';
 import { interestGroups } from '../dist/interest-groups.js';
 import { intuition } from '../dist/intuition.js';
+import { connectionTrails, edgeBetween } from '../dist/map-play.js';
 
 const source = new URL('../dist/data/knowledge.json', import.meta.url);
 const data = JSON.parse(await readFile(source, 'utf8'));
@@ -20,6 +21,10 @@ for (const node of data.nodes ?? []) {
 }
 
 const edgeKeys = new Set();
+for(const trail of connectionTrails){
+  for(const id of trail.nodes)if(!ids.has(id))problems.push(`意外な道の参照不正: ${trail.id}/${id}`);
+  for(let i=1;i<trail.nodes.length;i++)if(!edgeBetween(data.edges,trail.nodes[i-1],trail.nodes[i]))problems.push(`意外な道の断絶: ${trail.id}/${i}`);
+}
 const interestIds = new Set();
 for (const group of interestGroups) {
   if (group.nodes.length < 4 || new Set(group.nodes).size !== group.nodes.length) problems.push(`興味の分類が不足・重複: ${group.title}`);

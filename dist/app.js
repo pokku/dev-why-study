@@ -8,6 +8,7 @@ import { interestGroups, interestPaths } from './interest-groups.js';
 import { createRadioLab } from './radio-labs.js';
 import { createSoundLab } from './sound-labs.js';
 import { createExploreLab } from './explore-labs.js';
+import { trailInvitation, createConnectionTrail, createEdgeReason } from './map-play.js';
 
 const app = document.querySelector('#app');
 const homeTemplate = document.querySelector('#home-template');
@@ -364,7 +365,7 @@ function renderHome() {
     entryGrid.append(button);
   });
   const requested = new URLSearchParams(location.hash.slice(1)).get('explore');
-  if (!requested) app.prepend(createHomePortal());
+  if (!requested) { app.prepend(createHomePortal()); app.append(trailInvitation()); }
   renderExplorer(explorerMeta[requested] ? requested : 'formula', [], Boolean(requested));
   const invitation = document.createElement('a');
   invitation.className = 'lab-invitation';
@@ -458,7 +459,7 @@ function renderMindMap(id) {
   title.textContent = `${node.name}から広がる地図`;
   heading.append(eyebrow, title);
   const guide = document.createElement('p');
-  guide.textContent = '気になる丸を押すと、そこを中心に地図が広がります。';
+  guide.textContent = '丸で地図を広げる。線や「？」で、つながる理由を開く。';
   toolbar.append(back, heading, guide);
 
   const layout = document.createElement('div');
@@ -472,6 +473,10 @@ function renderMindMap(id) {
   const nodeLimit = window.matchMedia('(max-width: 720px)').matches ? 11 : 15;
   const positions = buildMindMap(id, nodeLimit).map((item, index) => ({ ...item, order: index }));
   const positionsById = new Map(positions.map((item) => [item.connection.other.id, item]));
+  const openEdge = edge => { location.hash = `node=${id}&edge=${knowledge.edges.indexOf(edge)}`; };
+  const edgeParam = new URLSearchParams(location.hash.slice(1)).get('edge');
+  const chosenEdge = edgeParam !== null && /^\d+$/.test(edgeParam) ? knowledge.edges[Number(edgeParam)] : null;
+  const selectedEdge = chosenEdge && (connectedEdges(id).includes(chosenEdge) || positions.some(p=>p.edge===chosenEdge)) ? chosenEdge : null;
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.setAttribute('class', 'mindmap-lines');
   svg.setAttribute('viewBox', '0 0 1000 650');
@@ -489,18 +494,28 @@ function renderMindMap(id) {
     line.setAttribute('class', `mindmap-line level-${position.level}`);
     line.style.setProperty('--delay', `${position.level * 70 + position.order * 28}ms`);
     svg.append(line);
+    const hit = line.cloneNode();
+    hit.setAttribute('class', 'mindmap-line-hit');
+    hit.addEventListener('click', () => openEdge(position.edge));
+    svg.append(hit);
+    if(position.edge===selectedEdge)line.classList.add('is-selected');
   });
   canvas.append(svg, makeMindMapNode(node, null, true));
 
   positions.forEach((position) => {
     const relatedNode = position.connection.other;
     canvas.append(makeMindMapNode(relatedNode, position));
-    if (position.level !== 1) return;
-    const label = document.createElement('span');
+    const source = position.level === 1 ? {x:500,y:325} : positionsById.get(position.parentId);
+    if (!source) return;
+    const label = document.createElement('button');
+    label.type = 'button';
     label.className = 'mindmap-edge-label';
-    label.textContent = position.connection.label;
-    label.style.left = `${(500 + (position.x - 500) * 0.56) / 10}%`;
-    label.style.top = `${(325 + (position.y - 325) * 0.56) / 6.5}%`;
+    label.textContent = position.level === 1 ? `${position.connection.label} ?` : '?';
+    label.setAttribute('aria-label', `${nodesById.get(position.edge.from).name}と${nodesById.get(position.edge.to).name}がつながる理由`);
+    label.setAttribute('aria-pressed', String(position.edge===selectedEdge));
+    label.addEventListener('click', () => openEdge(position.edge));
+    label.style.left = `${(source.x + (position.x - source.x) * 0.56) / 10}%`;
+    label.style.top = `${(source.y + (position.y - source.y) * 0.56) / 6.5}%`;
     label.style.setProperty('--delay', `${position.level * 70 + position.order * 28}ms`);
     canvas.append(label);
   });
@@ -514,6 +529,8 @@ function renderMindMap(id) {
     legend.append(item);
   });
   canvasWrap.append(canvas, legend);
+  let reasonPanel;
+  if(selectedEdge){reasonPanel=createEdgeReason(selectedEdge,nodesById);const close=document.createElement('a');close.href=`#node=${id}`;close.textContent='理由を閉じる';reasonPanel.prepend(close);canvasWrap.append(reasonPanel);}
 
   const inspector = document.createElement('aside');
   inspector.className = 'mindmap-inspector';
@@ -535,7 +552,7 @@ function renderMindMap(id) {
   connectedEdges(id).map((edge) => connectionFor(edge, id)).filter((item) => item.other).forEach((connection) => {
     const button = document.createElement('button');
     button.type = 'button';
-    button.addEventListener('click', () => navigateToNode(connection.other.id));
+    button.addEventListener('click', () => openEdge(connectedEdges(id).find(edge=>connectionFor(edge,id).other?.id===connection.other.id && edge.reason===connection.reason)));
     const relationHeading = document.createElement('span');
     relationHeading.innerHTML = `<b>${connection.other.name}</b><small>${connection.label}</small>`;
     const reason = document.createElement('p');
@@ -596,9 +613,11 @@ function renderMindMap(id) {
     }
     page.append(discovery);
   }
-  page.append(layout);
+  page.classList.add('has-map-play');
+  page.append(layout, trailInvitation(id));
   app.append(page);
-  app.focus({ preventScroll: true });
+  if(reasonPanel){reasonPanel.focus({preventScroll:true});reasonPanel.scrollIntoView({block:'nearest',behavior:'instant'});}
+  else app.focus({ preventScroll: true });
 }
 
 function renderNotFound() {
@@ -655,6 +674,13 @@ function updateSearch() {
 function renderRoute() {
   if (disposeLab) { disposeLab(); disposeLab = null; }
   const route = new URLSearchParams(location.hash.slice(1));
+  if(route.has('connections')){
+    document.querySelectorAll('.learning-global-nav a').forEach(a=>a.removeAttribute('aria-current'));
+    const page=createConnectionTrail(route.get('connections'),route.get('step'),knowledge);
+    if(!page)return renderNotFound();
+    app.replaceChildren(page);document.title='意外な2つを結ぶ道｜どうして勉強しないといけないの？';
+    window.scrollTo({top:0,behavior:'instant'});app.focus({preventScroll:true});return;
+  }
   const activeEntrance = route.has('lab') || route.has('labs') ? '#labs' : route.has('notebook') ? '#notebook' : route.has('explore') ? `#explore=${route.get('explore')}` : route.has('node') ? null : '#';
   document.querySelectorAll('.learning-global-nav a').forEach(a => { if (a.getAttribute('href') === activeEntrance) a.setAttribute('aria-current','true'); else a.removeAttribute('aria-current'); });
   if (route.has('notebook') || (route.has('journey') && !route.has('lab'))) {
