@@ -80,3 +80,16 @@ buildは既存の知識グラフに加えて、公式・科学図の参照先、
 `em-wave` は真空中の同位相の直線偏光を斜め投影。EとBの図の振幅はそれぞれ正規化し、実単位で同じ大きさという意味ではない。`spectrum` はc=299792458m/s、λ=c/f。対数スライダーの帯域境界は概略、マイクロ波は電波の一部。下の波は常に1周期で実寸ではない。`polarization` は進行方向に垂直な面で受信アンテナを回し、電場成分のcosθから電力比cos²θを計算。指向性・反射・障害物による損失を同時に表すものではない。
 
 実機確認: AM/FMの切り替えと波形、雑音0の聞き比べ、振幅雑音と加算雑音の違い、音量0と停止、設定変更・戻る・画面非表示で音が止まること。電磁波の開始/停止/1コマ、動きを減らす設定、スペクトルの各プリセット、偏波0°/45°/90°/180°、スマートフォン幅の図と操作・知識マップへの遷移を確認する。
+
+## 大学レベルの6体験（2026-09-26追加）
+
+原典は文献名で記録する。説明文・図はすべて独自に作成し、Canvasで描画する。
+
+- 衛星測位 `gps`: 擬似距離 ρᵢ=|p−sᵢ|+b（bは受信機時計のずれ×光速）をガウス・ニュートン法の非線形最小二乗で解く。実GPSの信号仕様は IS-GPS-200。体験は平面に縮めた相対単位のモデルで、大気遅延・衛星時計誤差・地球自転・3次元の幾何は含まない。衛星数と未知数が等しいと残差0になり誤差を検出できないことを明示。
+- 誤り訂正 `hamming`: R. W. Hamming, "Error Detecting and Error Correcting Codes", Bell System Technical Journal, 1950。ハミング(7,4)、検査ビットは1・2・4番。1ビット誤りは必ず訂正、2ビット誤りは誤訂正または見逃しになる。QRコード（ISO/IEC 18004）は実際にはリード・ソロモン符号を使うと本文で区別。
+- 公開鍵暗号 `rsa`: R. L. Rivest, A. Shamir, L. Adleman, "A Method for Obtaining Digital Signatures and Public-Key Cryptosystems", Communications of the ACM, 1978。11〜97の素数、eは17以上の小さな素数から(p−1)(q−1)と互いに素なもの、dは拡張ユークリッド法。1文字ずつA=1〜Z=26をそのまま暗号化する教材用で、パディングなし・実用不可と明示。
+- 経路探索 `pathfinding`: E. W. Dijkstra, "A Note on Two Problems in Connexion with Graphs", Numerische Mathematik, 1959。P. E. Hart, N. J. Nilsson, B. Raphael, "A Formal Basis for the Heuristic Determination of Minimum Cost Paths", IEEE Trans. SSC, 1968。24×14マス8近傍、斜め√2、角のすり抜け禁止、ユークリッド距離の見積もり（許容的）。w>1で最短の保証がなくなる。
+- ニューラルネットワーク `neural`: D. E. Rumelhart, G. E. Hinton, R. J. Williams, "Learning representations by back-propagating errors", Nature, 1986。2入力・tanh中間層0〜8個・シグモイド出力、交差エントロピー、全データの勾配降下。初期値・データは固定シードの疑似乱数。
+- ページランク `pagerank`: S. Brin, L. Page, "The Anatomy of a Large-Scale Hypertextual Web Search Engine", 1998。ランダムサーファーモデル、リンクのないページは全ページへ均等、べき乗法。現在の検索順位はほかの多数の手がかりを併用すると本文で区別。
+
+計算はNodeのテスト9件（線形方程式、測位の真値復元と時計無視時の誤差、全16通りのハミング1ビット訂正と2ビット誤訂正、全素数ペアのRSA往復、ダイクストラ/A*の最短一致と探索数、XORでの中間層の必要性、ページランクの確率保存と不動点）。実機確認: 各スライダー・プリセット、ハミングのビット操作、経路探索の壁の追加（キャンバスを押す）と再生、学習の再生/停止、スマホ幅の図と操作、戻る・非表示時の停止。

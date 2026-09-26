@@ -10,6 +10,9 @@ import { createSoundLab } from './sound-labs.js';
 import { createExploreLab } from './explore-labs.js';
 import { trailInvitation, createConnectionTrail, createEdgeReason } from './map-play.js';
 import { arrangeMapDesk, compactLabDetails } from './map-desk.js';
+import { createAdvancedLab } from './advanced-labs.js';
+import { createWhyIndex, createWhyPage } from './why-ui.js';
+import { schoolRoutes } from './why-data.js';
 
 const app = document.querySelector('#app');
 const homeTemplate = document.querySelector('#home-template');
@@ -126,53 +129,13 @@ const academicClusters = {
   'neural-network': '情報・AI',
   'computer-graphics': '情報・AI',
   'communication-engineering': '電気・通信',
+  'number-theory': '数学',
+  'least-squares': '数学',
+  'graph-theory': '数学',
+  'markov-chain': '数学',
+  'coding-theory': '情報・AI',
 };
 
-const schoolRoutes = {
-  'sound-harmonics': [['高校', '高校・物理']],
-  'doppler-effect': [['高校', '高校・物理']],
-  dispersion: [['高校', '高校・物理']],
-  beats: [['高校', '高校・物理']],
-  gravity: [['高校', '高校・物理']],
-  resonance: [['高校', '高校・物理']],
-  interference: [['高校', '高校・物理']],
-  'inverse-proportion': [['小学校', '小6・算数'], ['中学校', '中1・数学']],
-  'ohms-law': [['中学校', '中2・理科'], ['高校', '高校・物理']],
-  multiplication: [['小学校', '小2・算数'], ['小学校', '小3・算数']],
-  division: [['小学校', '小3・算数'], ['小学校', '小4・算数']],
-  fraction: [['小学校', '小3・算数'], ['小学校', '小4・算数'], ['小学校', '小5・算数'], ['小学校', '小6・算数']],
-  decimal: [['小学校', '小3・算数'], ['小学校', '小4・算数'], ['小学校', '小5・算数']],
-  ratio: [['小学校', '小5・算数']],
-  percentage: [['小学校', '小5・算数']],
-  proportion: [['小学校', '小6・算数']],
-  speed: [['小学校', '小5・算数'], ['小学校', '小6・算数']],
-  circle: [['小学校', '小6・算数'], ['中学校', '中1・数学'], ['中学校', '中3・数学']],
-  coordinates: [['中学校', '中1・数学']],
-  equation: [['中学校', '中1・数学'], ['中学校', '中2・数学'], ['中学校', '中3・数学']],
-  function: [['中学校', '中1・数学'], ['中学校', '中2・数学'], ['中学校', '中3・数学'], ['高校', '高校・数学I']],
-  'exponential-function': [['高校', '高校・数学II']],
-  logarithm: [['高校', '高校・数学II']],
-  probability: [['中学校', '中2・数学'], ['高校', '高校・数学A']],
-  statistics: [['中学校', '中2・数学'], ['中学校', '中3・数学'], ['高校', '高校・数学I']],
-  pythagorean: [['中学校', '中3・数学']],
-  atom: [['中学校', '中2・理科'], ['高校', '高校・化学']],
-  molecule: [['中学校', '中2・理科'], ['高校', '高校・化学']],
-  'chemical-reaction': [['中学校', '中2・理科'], ['高校', '高校・化学']],
-  cell: [['中学校', '中2・理科'], ['高校', '高校・生物']],
-  force: [['中学校', '中1・理科'], ['中学校', '中3・理科'], ['高校', '高校・物理']],
-  electricity: [['中学校', '中2・理科'], ['高校', '高校・物理']],
-  dna: [['中学校', '中3・理科'], ['高校', '高校・生物']],
-  programming: [['中学校', '中学・技術／情報'], ['高校', '高校・情報I']],
-  vector: [['高校', '高校・数学C']],
-  trigonometry: [['高校', '高校・数学II']],
-  calculus: [['高校', '高校・数学II'], ['高校', '高校・数学III']],
-  motion: [['高校', '高校・物理']],
-  rotation: [['高校', '高校・物理']],
-  wave: [['高校', '高校・物理']],
-  electromagnetism: [['高校', '高校・物理']],
-  binary: [['高校', '高校・情報I']],
-  algorithm: [['高校', '高校・情報I']],
-};
 
 const explorerMeta = {
   formula: { label: '公式・方程式から探す', steps: [{ title: 'この式、どこにつながる？', guide: 'まだ読めなくても大丈夫。気になる形を押して、身近な世界とのつながりを見てみよう。' }] },
@@ -182,7 +145,7 @@ const explorerMeta = {
     steps: [
       { title: '学校を選ぶ', guide: '小学校・中学校・高校から、いま学んでいる段階を選びます。' },
       { title: '学年・科目を選ぶ', guide: 'カリキュラムに沿って、学年と科目を絞ります。' },
-      { title: '単元を選ぶ', guide: '単元を選ぶと、その知識からマインドマップが広がります。' },
+      { title: '単元を選ぶ', guide: '単元を選ぶと、「どうして習うの？」への答えと、身近な使い道・この先の勉強・使う仕事が開きます。' },
     ],
   },
   academic: {
@@ -330,9 +293,9 @@ function renderExplorer(kind, selection = [], shouldScroll = false) {
       summary.textContent = node.summary;
       text.append(name, summary);
       const open = document.createElement('i');
-      open.textContent = '地図を開く →';
+      open.textContent = node.kind === 'school' && kind === 'school' ? 'なぜ習う？ →' : '地図を開く →';
       button.append(text, open);
-      button.addEventListener('click', () => navigateToNode(node.id));
+      button.addEventListener('click', () => { if (node.kind === 'school' && kind === 'school') location.hash = `why=${encodeURIComponent(node.id)}`; else navigateToNode(node.id); });
       options.append(button);
     });
   }
@@ -347,9 +310,9 @@ function renderHome() {
   const entryConfig = [
     { key: 'formula', symbol: 'E=mc²', title: '公式・方程式から', text: '見覚えのある式。まだ読めない式。その先にある世界へ。' },
     { key: 'science', symbol: '∿', title: '科学の図から', text: '波、風、振動。目に留まった図から、仕組みをたどる。' },
-    { key: 'school', symbol: '学', title: '学校から探す', text: '小学校・中学校・高校から、学年と科目、単元の順にたどる。' },
+    { key: 'school', symbol: '学', title: '学校から探す', text: '学年と科目から単元を選び、「どうして習うの？」の答えを見る。' },
     { key: 'academic', symbol: '∑', title: '学問から探す', text: '数学・物理・情報・通信の分野から、知りたいテーマを選ぶ。' },
-    { key: 'interest', symbol: '◎', title: '興味から探す', text: 'AI、スマートフォン、ゲーム、野球など、好きなものから戻る。' },
+    { key: 'interest', symbol: '◎', title: '興味から探す', text: 'AI、スマホ、野球、仕事など、好きなものや将来から戻る。' },
   ];
   const entryGrid = app.querySelector('#entry-grid');
   entryConfig.forEach((entry) => {
@@ -371,7 +334,7 @@ function renderHome() {
   const invitation = document.createElement('a');
   invitation.className = 'lab-invitation';
   invitation.href = '#labs';
-  invitation.innerHTML = `<span>触って、聞いて、わかる</span><strong>電波・光・音・宇宙・暮らしの${labs.length}の体験。</strong><span>体験一覧を開く →</span>`;
+  invitation.innerHTML = `<span>触って、聞いて、わかる</span><strong>音・光・電波から、暗号・AI・衛星測位まで。${labs.length}の体験。</strong><span>体験一覧を開く →</span>`;
   app.querySelector('#explorer-section').before(invitation);
 }
 
@@ -573,6 +536,13 @@ function renderMindMap(id) {
     condition.textContent = formula.condition;
     inspector.append(symbols, condition);
   }
+  if (node.kind === 'school') {
+    const why = document.createElement('a');
+    why.className = 'why-map-link';
+    why.href = `#why=${encodeURIComponent(id)}`;
+    why.textContent = `どうして「${node.name}」を習うの？ →`;
+    inspector.append(why);
+  }
   inspector.append(meta, relationTitle, relationList);
   layout.append(canvasWrap, inspector);
   page.append(toolbar);
@@ -684,8 +654,16 @@ function renderRoute() {
     app.replaceChildren(page);document.title='意外な2つを結ぶ道｜どうして勉強しないといけないの？';
     window.scrollTo({top:0,behavior:'instant'});app.focus({preventScroll:true});return;
   }
-  const activeEntrance = route.has('lab') || route.has('labs') ? '#labs' : route.has('notebook') ? '#notebook' : route.has('explore') ? `#explore=${route.get('explore')}` : route.has('node') ? null : '#';
+  const activeEntrance = route.has('why') ? '#why' : route.has('lab') || route.has('labs') ? '#labs' : route.has('notebook') ? '#notebook' : route.has('explore') ? `#explore=${route.get('explore')}` : route.has('node') ? null : '#';
   document.querySelectorAll('.learning-global-nav a').forEach(a => { if (a.getAttribute('href') === activeEntrance) a.setAttribute('aria-current','true'); else a.removeAttribute('aria-current'); });
+  if (route.has('why')) {
+    const whyId = route.get('why');
+    const page = whyId ? createWhyPage(whyId, knowledge) : createWhyIndex(knowledge);
+    if (!page) return renderNotFound();
+    app.replaceChildren(page);
+    document.title = `${whyId ? `どうして${nodesById.get(whyId).name}を習うの？` : 'なぜ習うの？'}｜どうして勉強しないといけないの？`;
+    window.scrollTo({ top: 0, behavior: 'instant' }); app.focus({ preventScroll: true }); return;
+  }
   if (route.has('notebook') || (route.has('journey') && !route.has('lab'))) {
     const page = route.has('notebook') ? createNotebook() : createJourney(route.get('journey'));
     if (!page) return renderNotFound();
@@ -703,7 +681,7 @@ function renderRoute() {
   if (route.has('lab')) {
     const definition = labs.find(lab => lab.id === route.get('lab'));
     if (!definition) return renderNotFound();
-    const lab = definition.id === 'string' ? createStringLab() : definition.renderer === 'explore' ? createExploreLab(definition.id, nodesById) : definition.renderer === 'sound' ? createSoundLab(definition.id, nodesById) : definition.renderer === 'radio' ? createRadioLab(definition.id, nodesById) : createScienceLab(definition.id, nodesById);
+    const lab = definition.id === 'string' ? createStringLab() : definition.renderer === 'explore' ? createExploreLab(definition.id, nodesById) : definition.renderer === 'advanced' ? createAdvancedLab(definition.id, nodesById) : definition.renderer === 'sound' ? createSoundLab(definition.id, nodesById) : definition.renderer === 'radio' ? createRadioLab(definition.id, nodesById) : createScienceLab(definition.id, nodesById);
     disposeLab = lab.dispose;
     attachLearning(lab.element, definition.id, route.get('journey'), nodesById);
     compactLabDetails(lab.element);

@@ -5,6 +5,7 @@ import { journeys, learning, everydayLinks } from '../dist/learning-data.js';
 import { interestGroups } from '../dist/interest-groups.js';
 import { intuition } from '../dist/intuition.js';
 import { connectionTrails, edgeBetween } from '../dist/map-play.js';
+import { whyAnswers, schoolRoutes, whyConnections } from '../dist/why-data.js';
 
 const source = new URL('../dist/data/knowledge.json', import.meta.url);
 const data = JSON.parse(await readFile(source, 'utf8'));
@@ -42,6 +43,13 @@ for (const edge of data.edges ?? []) {
 }
 
 const connected = new Set(data.edges.flatMap((edge) => [edge.from, edge.to]));
+for (const node of data.nodes.filter(n => n.kind === 'school')) {
+  if (!whyAnswers[node.id]?.[0] || !whyAnswers[node.id]?.[1]) problems.push(`「なぜ習う？」の答えがない単元: ${node.id}`);
+  if (!schoolRoutes[node.id]) problems.push(`学校段階がない単元: ${node.id}`);
+  const why = whyConnections(node.id, data.nodes, data.edges);
+  if (!why.uses.length || !why.careers.length) problems.push(`身近な使い道・仕事へつながらない単元: ${node.id}`);
+}
+for (const id of [...Object.keys(whyAnswers), ...Object.keys(schoolRoutes)]) if (data.nodes.find(n => n.id === id)?.kind !== 'school') problems.push(`学校の単元ではない回答・段階: ${id}`);
 const labIds = new Set();
 for (const lab of labs) {
   const explanation = intuition[lab.id];
@@ -155,3 +163,4 @@ console.log(`OK: ${ids.size} nodes, ${data.edges.length} edges, ${data.featuredP
 console.log(`OK: ${formulas.length} formulas, ${scenes.length} science illustrations, discovery paths connected`);
 console.log(`OK: ${labIds.size} interactive experiences, links and controls checked`);
 console.log(`OK: ${journeys.length} learning journeys, every experiment has a mission and a next question`);
+console.log(`OK: ${Object.keys(whyAnswers).length} school units answer why, with everyday uses and careers`);

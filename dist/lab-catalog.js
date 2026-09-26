@@ -1,6 +1,7 @@
 import { radioLabs } from './radio-catalog.js';
 import { soundLabs } from './sound-catalog.js';
 import { exploreLabs } from './explore-catalog.js';
+import { advancedLabs } from './advanced-catalog.js';
 export const labs = [
   ...exploreLabs,
   ...soundLabs,
@@ -13,4 +14,5 @@ export const labs = [
   { id: 'cancel', title: '波を打ち消す', icon: '±', category: '音と波', question: '音を足したのに、静かになる？', nodes: ['interference', 'wave', 'trigonometry', 'signal-processing'], controls: [['phase', '2つ目の波のずれ', 0, 360, 1, 180, '°']], formula: 'sin(ωt) + sin(ωt + φ)', everyday: 'ノイズキャンセリングは、耳の位置で騒音を弱めるように逆向きの音を作ります。', lesson: '0°なら強め合い、180°なら打ち消し合います。逆向きの波を「足す」ことで静かになる、という基本原理です。', limit: '同じ周波数・同じ振幅の2波を1点で足す理想モデル。周囲の音を録音・消音する機能ではなく、部屋全体が静かになるわけでもありません。', audio: true },
   { id: 'heat', title: '熱を広げる', icon: '▦', category: '暮らしと数学', question: '温めた場所から、何が起こる？', nodes: ['heat-equation', 'calculus', 'differential-equation', 'cooking'], controls: [['diffusion', '1ステップの広がりやすさ', .02, .24, .01, .16, '']], formula: '∂T/∂t = α∇²T', everyday: 'フライパンや金属のスプーンが温まるとき、熱は温度の高い部分から低い部分へ伝わります。', lesson: '板をタップして温め、動かしてみよう。外へ熱が逃げないので、温度の差は小さくなっても、板全体の平均は変わりません。', limit: '40×24マスの2次元熱拡散。端は断熱、色は0〜1の相対温度で摂氏ではありません。空気への放熱や対流は含みません。' },
   { id: 'image', title: '写真を波に分ける', icon: '▧', category: '暮らしと数学', question: '細かな波を減らすと、写真はどうなる？', nodes: ['image-frequency', 'fourier', 'trigonometry', 'compression'], controls: [['cutoff', '残す周波数の範囲', 1, 32, 1, 8, '/32']], formula: '画像 = 低い空間周波数の模様 ＋ 高い空間周波数の模様', everyday: 'JPEGも、画像をコサインの模様へ分ける変換を使います。どの細かさを残すかが、画像の見え方と情報量に関わります。', lesson: '1なら平均の明るさだけ。32なら32×32の元画像へ戻ります。右端は取り除いた細部で、灰色は差がない部分です。', limit: '端末内で32×32の白黒画像に縮小し、2次元の離散コサイン変換（DCT）で分解・復元。JPEGの符号化全体を再現するものではありません。低周波だけ残すと縁に波状の模様が出ることもあります。' },
+  ...advancedLabs,
 ];

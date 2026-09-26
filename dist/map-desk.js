@@ -9,6 +9,7 @@ export function arrangeMapDesk(page,{node,inspector,reasonPanel,formula}){
  const add=(id,title)=>{const section=element('section');section.id=`map-panel-${id}`;section.className='map-desk-panel';section.setAttribute('aria-label',title);panels.set(id,{title,section});return section;};
  const overview=add('overview','概要');
  original.slice(0,3).forEach(e=>overview.append(e));
+ const why=original.find(e=>e.classList.contains('why-map-link'));if(why)overview.append(why);
  const meta=original.find(e=>e.tagName==='DL');if(meta)overview.append(meta);
  const relations=add('relations','つながり');
  if(reasonPanel)relations.append(reasonPanel);
@@ -18,7 +19,7 @@ export function arrangeMapDesk(page,{node,inspector,reasonPanel,formula}){
  const invitation=page.querySelector('.lab-invitation.is-map');
  if(invitation)experiments.append(invitation);else experiments.append(element('p','この知識に直接対応する体験は、まだありません。線の先の知識からも探せます。'));
  const trails=page.querySelector('.map-play-invitation');if(trails)experiments.append(trails);
- if(formula){const math=add('formula','数式');for(const e of original.slice(3)){if(e!==meta&&e!==list&&e.tagName!=='H3')math.append(e);}const discovery=page.querySelector('.discovery-trail');if(discovery)math.append(discovery);}
+ if(formula){const math=add('formula','数式');for(const e of original.slice(3)){if(e!==meta&&e!==list&&e!==why&&e.tagName!=='H3')math.append(e);}const discovery=page.querySelector('.discovery-trail');if(discovery)math.append(discovery);}
  const videos=add('videos','動画');videos.append(element('h2',`${node.name}をもっと知る`),element('p','YouTubeで日本語の解説を探します。検索結果は外部サイトで開きます。'));
  for(const [label,query] of [['やさしい解説を探す','入門 わかりやすく'],['図や実験で見る','実験 図解'],['数式から詳しく学ぶ','数式 解説']]){const a=element('a',`${label} ↗`);a.href=videoSearchUrl(node.name,query);a.target='_blank';a.rel='noopener noreferrer';videos.append(a);}
  videos.append(element('p','特定の動画を推薦する一覧ではありません。式の条件や説明の根拠も確かめながら見てみよう。'));
